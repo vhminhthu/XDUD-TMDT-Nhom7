@@ -55,6 +55,6 @@ const dichvuSchema = new mongoose.Schema(
     { timestamps: true } 
 );
 
-const Dichvu = mongoose.model("Dichvu", dichvuSchema);
+const Dichvu = mongoose.model("Dichvu", dichvuSchema,"Dichvu");
 
 export default Dichvu;
