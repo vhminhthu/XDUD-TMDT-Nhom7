@@ -10,6 +10,9 @@ import FreelancerOverview from './pages/user/FreelancerOverview';
 import FreelancerInfo from './pages/user/FreelancerInfo';
 import CategoryDetail from './pages/user/CategoryDetail';
 import UserProfile from './pages/user/Profile';
+import QuanLyDichVu from './pages/user/QuanLyDichVu';
+import QuanLyDichVu_Edit from './pages/user/QuanLyDichVu_Edit';
+import QuanLyDichVu_Add from './pages/user/QuanLyDichVu_Add';
 
 function App() {
   return (
@@ -21,6 +24,9 @@ function App() {
       <Route path="/freelancer/info" element={<FreelancerInfo/>} />
       <Route path="/categories/:id" element={<CategoryDetail/>} />
       <Route path="/user/profile" element={<UserProfile/>} />
+      <Route path="/user/quanlydichvu/list" element={<QuanLyDichVu/>} />
+      <Route path="/user/quanlydichvu/list/:id/edit" element={<QuanLyDichVu_Edit/>} />
+      <Route path="/user/quanlydichvu/list/add" element={<QuanLyDichVu_Add/>} />
 
       {/* trang admin */}
       <Route path="/admin" element={<Admin/>} />
