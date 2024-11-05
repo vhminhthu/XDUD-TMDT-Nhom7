@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AdminNav from '../../components/AdminNav';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 export const Type = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newType, setNewType] = useState('');
+  const [danhmuc, setDanhmuc] = useState([]);
 
   const handleOpenDialog = () => {
     setIsDialogOpen(true);
@@ -12,21 +14,44 @@ export const Type = () => {
 
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
+    setNewType('');
   };
 
-  const handleSaveType = () => {
-    console.log('New Product Type:', newType);
-    setIsDialogOpen(false);
+  const handleSaveType = async () => {
+    try {
+      const response = await axios.post('/api/danhmuc', { tenDM: newType });
+      setDanhmuc([...danhmuc, { id: response.data._id, name: newType }]);
+      console.log('New Product Type:', newType);
+      handleCloseDialog();
+    } catch (error) {
+      console.error("Error saving new type", error);
+    }
   };
+
+  useEffect(() => {
+    const fetchDanhmuc = async () => {
+      try {
+        const response = await axios.get('/api/danhmuc');
+        const tendanhmuc = response.data.map(danh_muc => ({
+          id: danh_muc._id,
+          name: danh_muc.tenDM,
+          path: `/categories/${danh_muc._id}`
+        }));
+        setDanhmuc(tendanhmuc);
+      } catch (error) {
+        console.error("Lỗi đổ dữ liệu", error);
+      }
+    };
+
+    fetchDanhmuc();
+  }, []);
 
   return (
     <>
       <AdminNav>
         <div className="ml-24 flex-1 flex flex-col gap-5">
-      
           <div className="flex justify-between items-center p-6 bg-neutral-100 shadow-md">
             <h1 className="text-lg font-bold text-gray-900">Loại dịch vụ</h1>
-          
             <div className="flex items-center bg-white rounded-full shadow-md w-full max-w-2xl relative">
               <input
                 type="text"
@@ -52,11 +77,11 @@ export const Type = () => {
               </button>
             </div>
             <div className="flex items-center">
-               <button> 
+              <button>
                 <Link to="/adminprofile">
-                <img src="https://via.placeholder.com/40" alt="profile" className="w-10 h-10 rounded-full mr-2" />
+                  <img src="https://via.placeholder.com/40" alt="profile" className="w-10 h-10 rounded-full mr-2" />
                 </Link>
-                </button>
+              </button>
               <div>
                 <p className="text-gray-800 font-semibold">Pham Tien</p>
                 <p className="text-gray-500 text-sm">Admin</p>
@@ -93,36 +118,31 @@ export const Type = () => {
             <table className="min-w-full bg-white">
               <thead className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal ">
                 <tr>
-                  <th className="py-3 px-4  text-center">Tên dịch vụ</th>
-                  <th className="py-3 px-40 text-center">Mô tả dịch vụ</th>
-                  {/* <th className="py-3 px-20 text-center">Created Date</th> */}
-                  <th className="py-3 px-7 text-center">Chỉnh</th>
+                  <th className="py-3 px-6  text-center w-1/2">Tên dịch vụ</th>
+                  <th className="py-3 px-6 text-center w-1/2">Chỉnh</th>
                 </tr>
               </thead>
-
               <tbody className="text-gray-600 text-sm font-light">
-                <tr className="border-b border-gray-200 hover:bg-gray-100">
-                  <td className="py-3 px-10 text-center font-medium">Đồ họa và thiết kế</td>
-                  <td className="py-3 px-40 text-center">Dịch vụ đồ họa và thiết kế bao gồm các công việc sáng tạo, tạo ra các sản phẩm thị giác giúp doanh nghiệp, tổ chức hoặc cá nhân truyền tải thông điệp và xây dựng thương hiệu một cách hiệu quả</td>
-                  {/* <td className="py-3 px-20 text-center">20/8/2024</td> */}
-                  <td className="py-3 px-7 flex gap-3 ">
-                    <button>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                        stroke="currentColor"
-                        className="size-6"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-                        />
-                      </svg>
-                    </button>
-                    <span>
+                {danhmuc.map((category) => (
+                  <tr key={category.id} className="border-b border-gray-200 hover:bg-gray-100">
+                    <td className="py-3 px-20 text-center font-medium">{category.name}</td>
+                    <td className="py-3 px-80 flex gap-3 ">
+                      <button>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="size-6"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+                          />
+                        </svg>
+                      </button>
                       <button>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -139,15 +159,13 @@ export const Type = () => {
                           />
                         </svg>
                       </button>
-                    </span>
-                  </td>
-                </tr>
-  
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
         </div>
-
 
         {isDialogOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -155,22 +173,16 @@ export const Type = () => {
               <h2 className="text-xl font-bold mb-4">Thêm loại dịch vụ mới</h2>
               <input
                 type="text"
-                placeholder="Nhập tên loại dịch vụ..."
                 value={newType}
                 onChange={(e) => setNewType(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md mb-4"
+                placeholder="Tên dịch vụ mới"
+                className="w-full p-2 border border-gray-300 rounded mb-4"
               />
-              <div className="flex justify-end gap-4">
-                <button
-                  className="bg-gray-500 text-white px-4 py-2 rounded-md"
-                  onClick={handleCloseDialog}
-                >
-                  Quay lại
+              <div className="flex justify-end">
+                <button className="bg-gray-300 text-black px-4 py-2 rounded mr-2" onClick={handleCloseDialog}>
+                  Hủy
                 </button>
-                <button
-                  className="bg-blue-500 text-white px-4 py-2 rounded-md"
-                  onClick={handleSaveType}
-                >
+                <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={handleSaveType}>
                   Lưu
                 </button>
               </div>
@@ -181,5 +193,6 @@ export const Type = () => {
     </>
   );
 };
+
 
 export default Type;
