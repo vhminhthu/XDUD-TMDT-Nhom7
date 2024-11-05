@@ -113,10 +113,7 @@ export const xoaDichVu = async (req, res) => {
     }
 };
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 60fed8ab2de686b5bc9f928f393915fa68851bc6
 export const idDichvu = async (req, res) => {
     const { id } = req.params; 
     try {
@@ -130,8 +127,5 @@ export const idDichvu = async (req, res) => {
         res.status(500).json({ error: "Lỗi 500" });
         console.log("Lỗi idDichVu controller", error.message);
     }
-<<<<<<< HEAD
 }
-=======
-};
->>>>>>> 60fed8ab2de686b5bc9f928f393915fa68851bc6
+
