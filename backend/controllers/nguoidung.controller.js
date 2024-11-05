@@ -4,7 +4,6 @@ export const formDangKy = async (req, res) => {
     try {
         const { email, soDienThoai, diaChi } = req.body;
 
-     
         const nguoidung = await Nguoidung.findOne({ email });
         if (!nguoidung) {
             return res.status(404).json({ error: "Người dùng không tồn tại" });
@@ -13,7 +12,7 @@ export const formDangKy = async (req, res) => {
         if (nguoidung.vaiTro === "freelancer") {
             return res.status(400).json({ message: "Bạn đã đăng ký là freelancer rồi." });
         }
-      
+        
         nguoidung.soDienThoai = soDienThoai;
         nguoidung.diaChi = diaChi;
         nguoidung.vaiTro = "freelancer"; 

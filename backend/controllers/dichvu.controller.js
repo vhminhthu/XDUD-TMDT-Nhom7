@@ -16,16 +16,13 @@ export const themDichVu = async (req, res) => {
         const { tenDichVu, moTaDV, giaTien, kyNang, thoiGianHoanThanh, trangThaiDV, idDanhMucDV } = req.body;
         const idNguoiDung = req.nguoidung._id.toString();
 
-   
         const nguoiDung = await Nguoidung.findById(idNguoiDung);
         if (!nguoiDung) return res.status(404).json({ message: "Không tìm thấy người dùng" });
 
-      
         if (nguoiDung.vaiTro !== 'freelancer') {
             return res.status(403).json({ message: "Bạn chưa đăng ký làm freelancer" });
         }
 
-   
         const dichVuMoi = new Dichvu({
             tenDichVu,
             moTaDV,
@@ -37,21 +34,17 @@ export const themDichVu = async (req, res) => {
             idDanhMucDV
         });
 
-    
         await dichVuMoi.save();
 
-  
         const danhMuc = await Danhmuc.findById(idDanhMucDV);
         if (!danhMuc) return res.status(404).json({ message: "Không tìm thấy danh mục" });
 
         danhMuc.idDichVuDM.push(dichVuMoi._id); 
         await danhMuc.save();
 
-
         nguoiDung.idDichVuND.push(dichVuMoi._id); 
         await nguoiDung.save();
 
-       
         res.status(201).json(dichVuMoi);
 
     } catch (error) {
@@ -69,7 +62,6 @@ export const suaDichVu = async (req, res) => {
 
         if (!dichvu) return res.status(404).json({ message: "Không tìm thấy dịch vụ" });
 
-       
         if (tenDichVu) dichvu.tenDichVu = tenDichVu;
         if (moTaDV) dichvu.moTaDV = moTaDV;
         if (giaTien) dichvu.giaTien = giaTien;
@@ -77,7 +69,6 @@ export const suaDichVu = async (req, res) => {
         if (thoiGianHoanThanh) dichvu.thoiGianHoanThanh = thoiGianHoanThanh;
         if (trangThaiDV) dichvu.trangThaiDV = trangThaiDV;
 
- 
         const idDanhMucCu = dichvu.idDanhMucDV;
 
         if (idDanhMucDV) {
@@ -88,19 +79,16 @@ export const suaDichVu = async (req, res) => {
                 return res.status(404).json({ message: "Không tìm thấy danh mục này" });
             }
 
-           
             if (danhMucCu) {
                 danhMucCu.idDichVuDM.pull(dichvu._id); 
                 await danhMucCu.save(); 
             }
 
-          
             dichvu.idDanhMucDV = danhMucMoi._id; 
             danhMucMoi.idDichVuDM.push(dichvu._id); 
             await danhMucMoi.save();
         }
 
-     
         dichvu = await dichvu.save();
 
         return res.status(200).json({ dichvu });
@@ -139,7 +127,6 @@ export const xoaDichVu = async (req, res) => {
             await danhmuc.save();
         }
 
-      
         await Dichvu.findByIdAndDelete(req.params.id);
 
         res.status(200).json({ message: "Xóa dịch vụ thành công" });
