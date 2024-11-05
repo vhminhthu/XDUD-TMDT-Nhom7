@@ -3,7 +3,7 @@ import Footer from "../../components/user/Footer"; */
 import CategoriesMenu from "../../components/user/CategoriesMenu";
 import Header from "../../components/user/Header";
 
-function UserTrangChu() {
+function Home() {
     return (
         <div className='container'> 
             <div id="Header">
@@ -19,4 +19,4 @@ function UserTrangChu() {
     )
 }
 
-export default UserTrangChu;
+export default Home;
