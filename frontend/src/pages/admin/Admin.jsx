@@ -17,7 +17,7 @@ export const Admin = () => {
             </button>
             <div className="flex items-center">
               <button> 
-                <Link to="/profile">
+                <Link to="/adminprofile">
                 <img src="https://via.placeholder.com/40" alt="profile" className="w-10 h-10 rounded-full mr-2" />
                 </Link>
                 </button>

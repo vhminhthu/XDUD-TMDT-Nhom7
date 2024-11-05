@@ -18,7 +18,7 @@ function App() {
       {/* trang admin */}
       <Route path="/admin" element={<Admin/>} />
       <Route path="/type" element={<Type/>} />
-      <Route path="/profile" element={<Profile/>} />
+      <Route path="/adminprofile" element={<Profile/>} />
     </Routes>
   )
 }
