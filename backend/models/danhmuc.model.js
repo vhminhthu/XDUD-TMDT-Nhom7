@@ -4,6 +4,7 @@ const danhmucSchema = new mongoose.Schema(
     {
         tenDM:{
             type: String,
+            required: true
         },
         idDichVuDM:[
             {

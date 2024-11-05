@@ -5,8 +5,11 @@ import axios from 'axios';
 
 export const Type = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [newType, setNewType] = useState('');
   const [danhmuc, setDanhmuc] = useState([]);
+  const [editType, setEditType] = useState('');
+  const [editId, setEditId] = useState('');
 
   const handleOpenDialog = () => {
     setIsDialogOpen(true);
@@ -17,32 +20,74 @@ export const Type = () => {
     setNewType('');
   };
 
+  const handleOpenEditDialog = (type, id) => {
+    setEditType(type);
+    setEditId(id);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleEditDialogClose = () => {
+    setIsEditDialogOpen(false);
+    setEditType('');
+    setEditId('');
+  };
+
   const handleSaveType = async () => {
+    if (newType.trim() === '') {
+      alert('Tên dịch vụ không được để trống!');
+      return;
+    }
+
     try {
-      const response = await axios.post('/api/danhmuc', { tenDM: newType });
+      const response = await axios.post('/api/danhmuc/them', { tenDM: newType });
+      console.log('dữ liệu lấy:', response.data);
       setDanhmuc([...danhmuc, { id: response.data._id, name: newType }]);
-      console.log('New Product Type:', newType);
       handleCloseDialog();
     } catch (error) {
-      console.error("Error saving new type", error);
+      console.error("Lỗi lưu danh mục", error.response ? error.response.data : error.message);
+    }
+  };
+
+  const handleUpdateType = async () => {
+    if (editType.trim() === '') {
+      alert('Danh mục không được rỗng');
+      return;
+    }
+
+    try {
+      const response = await axios.patch(`/api/danhmuc/chinh/${editId}`, { tenDM: editType });
+      console.log('dữ liệu lấy:', response.data);
+      setDanhmuc(danhmuc.map(category => category.id === editId ? { ...category, name: editType } : category));
+      handleEditDialogClose();
+    } catch (error) {
+      console.error("Lỗi cập nhật danh mục", error.response ? error.response.data : error.message);
+    }
+  };
+
+  const handleDeleteDanhmuc = async (id) => {
+    try {
+      await axios.delete(`/api/danhmuc/${id}`);
+      fetchDanhmuc();
+    } catch (error) {
+      console.error('Lỗi khi xóa danh mục:', error);
+    }
+  };
+
+  const fetchDanhmuc = async () => {
+    try {
+      const response = await axios.get('/api/danhmuc');
+      const tendanhmuc = response.data.map(danh_muc => ({
+        id: danh_muc._id,
+        name: danh_muc.tenDM,
+   
+      }));
+      setDanhmuc(tendanhmuc);
+    } catch (error) {
+      console.error("Lỗi đổ dữ liệu", error);
     }
   };
 
   useEffect(() => {
-    const fetchDanhmuc = async () => {
-      try {
-        const response = await axios.get('/api/danhmuc');
-        const tendanhmuc = response.data.map(danh_muc => ({
-          id: danh_muc._id,
-          name: danh_muc.tenDM,
-          path: `/categories/${danh_muc._id}`
-        }));
-        setDanhmuc(tendanhmuc);
-      } catch (error) {
-        console.error("Lỗi đổ dữ liệu", error);
-      }
-    };
-
     fetchDanhmuc();
   }, []);
 
@@ -127,7 +172,7 @@ export const Type = () => {
                   <tr key={category.id} className="border-b border-gray-200 hover:bg-gray-100">
                     <td className="py-3 px-20 text-center font-medium">{category.name}</td>
                     <td className="py-3 px-80 flex gap-3 ">
-                      <button>
+                      <button onClick={() => handleOpenEditDialog(category.name, category.id)}>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           fill="none"
@@ -143,8 +188,8 @@ export const Type = () => {
                           />
                         </svg>
                       </button>
-                      <button>
-                        <svg
+                      <button onClick={() => handleDeleteDanhmuc(category.id)} >
+                      <svg
                           xmlns="http://www.w3.org/2000/svg"
                           fill="none"
                           viewBox="0 0 24 24"
@@ -165,34 +210,58 @@ export const Type = () => {
               </tbody>
             </table>
           </div>
-        </div>
 
-        {isDialogOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
-              <h2 className="text-xl font-bold mb-4">Thêm loại dịch vụ mới</h2>
-              <input
-                type="text"
-                value={newType}
-                onChange={(e) => setNewType(e.target.value)}
-                placeholder="Tên dịch vụ mới"
-                className="w-full p-2 border border-gray-300 rounded mb-4"
-              />
-              <div className="flex justify-end">
-                <button className="bg-gray-300 text-black px-4 py-2 rounded mr-2" onClick={handleCloseDialog}>
-                  Hủy
-                </button>
-                <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={handleSaveType}>
-                  Lưu
-                </button>
+     
+          {isDialogOpen && (
+            <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+              <div className="bg-white rounded-lg p-5 w-1/3">
+                <h2 className="text-lg font-semibold mb-4">Thêm loại dịch vụ mới</h2>
+                <input
+                  type="text"
+                  value={newType}
+                  onChange={(e) => setNewType(e.target.value)}
+                  placeholder="Nhập tên dịch vụ"
+                  className="border rounded w-full p-2 mb-4"
+                />
+                <div className="flex justify-end">
+                  <button className="bg-gray-300  text-white px-4 py-2 rounded" onClick={handleCloseDialog}>
+                    Đóng
+                  </button>
+                  <button className="bg-blue-500  text-white px-4 py-2 rounded ml-2" onClick={handleSaveType}>
+                    Lưu
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+
+        
+          {isEditDialogOpen && (
+            <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+              <div className="bg-white rounded-lg p-5 w-1/3">
+                <h2 className="text-lg font-semibold mb-4">Chỉnh sửa loại dịch vụ</h2>
+                <input
+                  type="text"
+                  value={editType}
+                  onChange={(e) => setEditType(e.target.value)}
+                  placeholder="Nhập tên dịch vụ"
+                  className="border rounded w-full p-2 mb-4"
+                />
+                <div className="flex justify-end">
+                  <button className="bg-gray-300 text-white px-4 py-2 rounded" onClick={handleEditDialogClose}>
+                    Đóng
+                  </button>
+                  <button className="bg-blue-500 text-white px-4 py-2 rounded ml-2" onClick={handleUpdateType}>
+                    Lưu
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </AdminNav>
     </>
   );
 };
-
 
 export default Type;

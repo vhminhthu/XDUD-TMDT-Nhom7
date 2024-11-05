@@ -120,3 +120,19 @@ export const xoaDichVu = async (req, res) => {
         console.log("Lỗi xoaDichVu controller", error.message);
     }
 };
+
+
+export const idDichvu = async (req, res) => {
+    const { id } = req.params; 
+    try {
+        const dichvu = await Dichvu.findById(id);
+        if (!dichvu) {
+            return res.status(404).json({ message: 'Dịch vụ không tồn tại' });
+        }
+
+        return res.status(200).json(dichvu);
+    } catch (error) {
+        res.status(500).json({ error: "Lỗi 500" });
+        console.log("Lỗi idDichVu controller", error.message);
+    }
+}

@@ -30,9 +30,7 @@ export const themDanhMuc = async (req, res) => {
 		await danhMucMoi.save();
 
 		
-		return res.status(201).json({
-			tenDM: danhMucMoi.tenDM,
-		});
+        return res.status(201).json(danhMucMoi);
 
 	} catch (error) {
 		console.log("Lỗi themDanhMuc controller", error.message);
