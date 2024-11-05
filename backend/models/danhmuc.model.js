@@ -15,6 +15,6 @@ const danhmucSchema = new mongoose.Schema(
     { timestamps: true } 
 );
 
-const Danhmuc = mongoose.model("Danhmuc", danhmucSchema);
+const Danhmuc = mongoose.model("Danhmuc", danhmucSchema, "Danhmuc");
 
 export default Danhmuc;

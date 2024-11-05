@@ -2,32 +2,32 @@ import mongoose from "mongoose";
 
 const dichvuSchema = new mongoose.Schema(
     {
-        tenDichVu:{
+        tenDichVu:{    //
             type: String,
         },
-        moTaDV:{
+        moTaDV:{   //
             type: String,
         },
-        giaTien:{
+        giaTien:{   //
             type: Number,
         },
-        kyNang:[
+        kyNang:[   //
             {
                 type: String,
             },
         ],
-        thoiGianHoanThanh:{
+        thoiGianHoanThanh:{     //
             type: String,
         },
-        idDanhMucDV:{
+        idDanhMucDV:{    //
             type: mongoose.Schema.Types.ObjectId,
 			ref: "Danhmuc",
         },
-        idNguoiDungDV:{
+        idNguoiDungDV:{    //
             type: mongoose.Schema.Types.ObjectId,
 			ref: "Nguoidung",
         },
-        trangThaiDV:{
+        trangThaiDV:{     //
             type: String,
         },
         danhSachDanhGia:[
