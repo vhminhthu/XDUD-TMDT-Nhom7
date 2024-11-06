@@ -3,6 +3,7 @@ import Header from "../../components/user/Header";
 import { useState, useEffect } from "react";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import TagList from "../../components/user/TagList";
 
 function QuanLyDichVu_Add() {
     const navigate = useNavigate();
@@ -10,6 +11,7 @@ function QuanLyDichVu_Add() {
         tenDichVu: '',
         moTaDV: '',
         giaTien: '',
+        kyNang: [],
         thoiGianHoanThanh: '',
         trangThaiDV: '',
         idDanhMucDV: '',
@@ -39,19 +41,17 @@ function QuanLyDichVu_Add() {
             ...prevData,
             [name]: value,
         }));
+    };
 
-        if (name === 'idDanhMucDV') {
-            console.log("ID danh mục được chọn:", value);
-        }
+    const handleTagsChange = (newTags) => {
+        setFormData(prevData => ({
+            ...prevData,
+            kyNang: newTags
+        }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        if (!formData.tenDichVu || !formData.moTaDV || !formData.giaTien || !formData.idDanhMucDV) {
-            alert("Vui lòng điền đầy đủ thông tin!");
-            return;
-        }
 
         try {
             const response = await axios.post('/api/dichvu/them', formData);
@@ -89,7 +89,7 @@ function QuanLyDichVu_Add() {
                             name="tenDichVu"
                             value={formData.tenDichVu}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
+                            className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-pink-500"
                             required
                         />
                     </div>
@@ -103,9 +103,16 @@ function QuanLyDichVu_Add() {
                             name="moTaDV"
                             value={formData.moTaDV}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
+                            className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-pink-500"
                             required
                         />
+                    </div>
+
+                    <div className="container mx-auto mt-10">
+                        <label className="block text-gray-600 font-medium mb-1">
+                            Kỹ năng
+                        </label>
+                        <TagList onTagsChange={handleTagsChange}/>
                     </div>
 
                     <div>
@@ -117,7 +124,7 @@ function QuanLyDichVu_Add() {
                             name="giaTien"
                             value={formData.giaTien}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
+                            className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-pink-500"
                             required
                         />
                     </div>
@@ -131,7 +138,7 @@ function QuanLyDichVu_Add() {
                             name="thoiGianHoanThanh"
                             value={formData.thoiGianHoanThanh}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
+                            className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-pink-500"
                             required
                         />
                     </div>
@@ -145,7 +152,7 @@ function QuanLyDichVu_Add() {
                             name="trangThaiDV"
                             value={formData.trangThaiDV}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
+                            className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-pink-500"
                         />
                     </div>
 
@@ -157,7 +164,7 @@ function QuanLyDichVu_Add() {
                             name="idDanhMucDV"
                             value={formData.idDanhMucDV}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
+                            className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-pink-500"
                             required
                         >
                             <option value="">Chọn danh mục</option>
@@ -171,7 +178,7 @@ function QuanLyDichVu_Add() {
 
                     <button
                         type="submit"
-                        className="w-full mt-4 bg-blue-500 text-white font-semibold py-2 rounded-lg hover:bg-blue-600 transition duration-200">
+                        className="w-full mt-4 bg-pink-500 text-white font-semibold py-2 rounded-lg hover:bg-pink-600 transition duration-200">
                         Lưu
                     </button>
                 </form>

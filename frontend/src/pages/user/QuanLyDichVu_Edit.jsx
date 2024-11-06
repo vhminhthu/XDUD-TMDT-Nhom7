@@ -3,6 +3,7 @@ import Header from "../../components/user/Header";
 import { useState, useEffect } from "react";
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
+import TagList from "../../components/user/TagList";
 
 function QuanLyDichVu_Edit() {
     const { id } = useParams(); 
@@ -11,15 +12,25 @@ function QuanLyDichVu_Edit() {
         tenDichVu: '',
         moTaDV: '',
         giaTien: '',
+        kyNang: [],
         thoiGianHoanThanh: '',
         trangThaiDV: '',
+        idDanhMucDV: '',
     });
+    const [categories, setCategories] = useState([]);
 
     useEffect(() => {
         const fetchServiceData = async () => {
             try {
-                const response = await axios.get(`/api/dichvu/lay/${id}`);
-                setFormData(response.data);
+                const response1 = await axios.get(`/api/dichvu/lay/${id}`);
+                setFormData(response1.data);
+
+                const response2 = await axios.get('/api/danhmuc');
+                const categoryNames = response2.data.map(category => ({
+                    id: category._id,
+                    name: category.tenDM,
+                }));
+                setCategories(categoryNames); 
             } catch (error) {
                 console.error("Lỗi khi lấy dữ liệu dịch vụ:", error);
             }
@@ -34,6 +45,15 @@ function QuanLyDichVu_Edit() {
             [name]: value,
         }));
     };
+
+    const handleTagsChange = (newTags) => {
+        setFormData(prevData => ({
+            ...prevData,
+            kyNang: newTags // Đảm bảo cập nhật đúng mảng kyNang
+        }));
+        console.log("Cập nhật kỹ năng:", newTags); // Kiểm tra đầu ra của kỹ năng mới
+    };
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -85,6 +105,13 @@ function QuanLyDichVu_Edit() {
                         />
                     </div>
 
+                    <div className="container mx-auto mt-10">
+                        <label className="block text-gray-600 font-medium mb-1">
+                            Kỹ năng
+                        </label>
+                        <TagList onTagsChange={handleTagsChange} currentTags={formData.kyNang}/>
+                    </div>
+
                     <div>
                         <label className="block text-gray-600 font-medium mb-1">
                             Giá Tiền
@@ -122,6 +149,26 @@ function QuanLyDichVu_Edit() {
                             onChange={handleChange}
                             className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-400"
                         />
+                    </div>
+
+                    <div>
+                        <label className="block text-gray-600 font-medium mb-1">
+                            Danh Mục
+                        </label>
+                        <select
+                            name="idDanhMucDV"
+                            value={formData.idDanhMucDV}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-pink-500"
+                            required
+                        >
+                            <option value="">Chọn danh mục</option>
+                            {categories.map((category) => (
+                                <option key={category.id} value={category.id}>
+                                    {category.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     <button

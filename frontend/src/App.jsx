@@ -13,6 +13,7 @@ import UserProfile from './pages/user/Profile';
 import QuanLyDichVu from './pages/user/QuanLyDichVu';
 import QuanLyDichVu_Edit from './pages/user/QuanLyDichVu_Edit';
 import QuanLyDichVu_Add from './pages/user/QuanLyDichVu_Add';
+import DichVuDetail from './pages/user/DichVuDetail';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
       <Route path="/user/quanlydichvu/list" element={<QuanLyDichVu/>} />
       <Route path="/user/quanlydichvu/list/:id/edit" element={<QuanLyDichVu_Edit/>} />
       <Route path="/user/quanlydichvu/list/add" element={<QuanLyDichVu_Add/>} />
+      <Route path="/categories/dichvu/:id" element={<DichVuDetail/>} />
 
       {/* trang admin */}
       <Route path="/admin" element={<Admin/>} />

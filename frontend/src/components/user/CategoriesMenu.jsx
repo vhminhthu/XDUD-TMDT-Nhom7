@@ -29,7 +29,7 @@ function CategoriesMenu() {
                 <ul className="flex space-x-2 md:space-x-10">
                     {categories.map((category) => (
                         <li key={category.id} className="list-none">
-                            <Link to={category.path} className="text-lg hover:border-b-4 hover:border-pink-600 hover:pb-4">
+                            <Link to={category.path} className="text-lg uppercase hover:border-b-4 hover:border-pink-600 hover:pb-4">
                                 {category.name}
                             </Link>
                         </li>

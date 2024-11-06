@@ -1,5 +1,5 @@
 import express from "express"
-
+import morgan from 'morgan'
 import dotenv from "dotenv"
 import cookieParser from "cookie-parser"
 import connectMongoDB from "./db/connectMongoDB.js"
@@ -17,6 +17,7 @@ const PORT = process.env.PORT || 5000
 
 app.use(express.urlencoded({ extended: true })) //to parse form data
 app.use(cookieParser())
+app.use(morgan("tiny"))
 
 
 app.use("/api/user",userRoutes )

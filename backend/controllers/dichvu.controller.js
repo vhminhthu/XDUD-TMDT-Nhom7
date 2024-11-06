@@ -13,13 +13,13 @@ export const layDichVu = async (req, res) => {
 };
 export const themDichVu = async (req, res) => {
     try {
-        const { tenDichVu, moTaDV, giaTien, /* kyNang, */ thoiGianHoanThanh, trangThaiDV, idDanhMucDV } = req.body;
+        const { tenDichVu, moTaDV, giaTien, kyNang, thoiGianHoanThanh, trangThaiDV, idDanhMucDV } = req.body;
 
         const dichVuMoi = new Dichvu({
             tenDichVu,
             moTaDV,
             giaTien,
-           /*  kyNang, */
+            kyNang,
             thoiGianHoanThanh,
             trangThaiDV,
             idDanhMucDV
@@ -46,7 +46,7 @@ export const themDichVu = async (req, res) => {
 
 
 export const suaDichVu = async (req, res) => {
-    const { tenDichVu, moTaDV, giaTien, thoiGianHoanThanh, trangThaiDV} = req.body;
+    const { tenDichVu, moTaDV, kyNang, giaTien, thoiGianHoanThanh, trangThaiDV, idDanhMucDV} = req.body;
 
     try {
         let dichvu = await Dichvu.findById(req.params.id);
@@ -56,13 +56,13 @@ export const suaDichVu = async (req, res) => {
         if (tenDichVu) dichvu.tenDichVu = tenDichVu;
         if (moTaDV) dichvu.moTaDV = moTaDV;
         if (giaTien) dichvu.giaTien = giaTien;
-        /* if (kyNang) dichvu.kyNang = kyNang; */
+        if (kyNang) dichvu.kyNang = kyNang;
         if (thoiGianHoanThanh) dichvu.thoiGianHoanThanh = thoiGianHoanThanh;
         if (trangThaiDV) dichvu.trangThaiDV = trangThaiDV;
 
-        /* const idDanhMucCu = dichvu.idDanhMucDV; */
+        const idDanhMucCu = dichvu.idDanhMucDV;
 
-        /*  if (idDanhMucDV) {
+        if (idDanhMucDV) {
             const danhMucCu = await Danhmuc.findById(idDanhMucCu);
             const danhMucMoi = await Danhmuc.findById(idDanhMucDV);
 
@@ -78,7 +78,7 @@ export const suaDichVu = async (req, res) => {
             dichvu.idDanhMucDV = danhMucMoi._id; 
             danhMucMoi.idDichVuDM.push(dichvu._id); 
             await danhMucMoi.save();
-        } */
+        }
 
         dichvu = await dichvu.save();
 
@@ -116,12 +116,13 @@ export const xoaDichVu = async (req, res) => {
 
 export const idDichvu = async (req, res) => {
     const { id } = req.params; 
-    try {
+    console.log(id)
+    try {   
         const dichvu = await Dichvu.findById(id);
         if (!dichvu) {
             return res.status(404).json({ message: 'Dịch vụ không tồn tại' });
         }
-
+        console.log(dichvu)
         return res.status(200).json(dichvu);
     } catch (error) {
         res.status(500).json({ error: "Lỗi 500" });
@@ -129,3 +130,19 @@ export const idDichvu = async (req, res) => {
     }
 }
 
+export const DichvutheoDM = async (req, res) => {
+    const { id } = req.params; 
+    try {
+        const danhmuc = await Danhmuc.findById(id);
+        if (!danhmuc) {
+            return res.status(404).json({ message: 'Danh mục không tồn tại' });
+        }
+
+        const dichvu = await Dichvu.find({ idDanhMucDV: id });
+
+        return res.status(200).json(dichvu);
+    } catch (error) {
+        res.status(500).json({ error: "Lỗi 500" });
+        console.log("Lỗi DichvutheoDM controller", error.message);
+    }
+}
