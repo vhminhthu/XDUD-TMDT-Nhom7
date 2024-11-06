@@ -96,7 +96,7 @@ export const Type = () => {
       <AdminNav>
         <div className="ml-24 flex-1 flex flex-col gap-5">
           <div className="flex justify-between items-center p-6 bg-neutral-100 shadow-md">
-            <h1 className="text-lg font-bold text-gray-900">Loại dịch vụ</h1>
+            <h1 className="text-lg font-bold text-gray-900">Danh mục</h1>
             <div className="flex items-center bg-white rounded-full shadow-md w-full max-w-2xl relative">
               <input
                 type="text"
@@ -163,7 +163,7 @@ export const Type = () => {
             <table className="min-w-full bg-white">
               <thead className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal ">
                 <tr>
-                  <th className="py-3 px-6  text-center w-1/2">Tên dịch vụ</th>
+                  <th className="py-3 px-6  text-center w-1/2">Tên danh mục</th>
                   <th className="py-3 px-6 text-center w-1/2">Chỉnh</th>
                 </tr>
               </thead>
@@ -215,12 +215,12 @@ export const Type = () => {
           {isDialogOpen && (
             <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
               <div className="bg-white rounded-lg p-5 w-1/3">
-                <h2 className="text-lg font-semibold mb-4">Thêm loại dịch vụ mới</h2>
+                <h2 className="text-lg font-semibold mb-4">Thêm danh mục mới</h2>
                 <input
                   type="text"
                   value={newType}
                   onChange={(e) => setNewType(e.target.value)}
-                  placeholder="Nhập tên dịch vụ"
+                  placeholder="Nhập tên danh mục"
                   className="border rounded w-full p-2 mb-4"
                 />
                 <div className="flex justify-end">
@@ -239,7 +239,7 @@ export const Type = () => {
           {isEditDialogOpen && (
             <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
               <div className="bg-white rounded-lg p-5 w-1/3">
-                <h2 className="text-lg font-semibold mb-4">Chỉnh sửa loại dịch vụ</h2>
+                <h2 className="text-lg font-semibold mb-4">Chỉnh sửa danh mục</h2>
                 <input
                   type="text"
                   value={editType}
