@@ -3,7 +3,6 @@ import Header from "../../components/user/Header";
 import { useState, useEffect } from "react";
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
-import TagList from "../../components/user/TagList";
 
 function QuanLyDichVu_Edit() {
     const { id } = useParams(); 
@@ -16,28 +15,35 @@ function QuanLyDichVu_Edit() {
         thoiGianHoanThanh: '',
         trangThaiDV: '',
         idDanhMucDV: '',
+        phanLoai: { coban: {}, thuong: {}, nangcao: {} },
+        anhDichVu: '',
     });
+    
     const [categories, setCategories] = useState([]);
+    const [coverImage, setCoverImage] = useState(null); 
 
     useEffect(() => {
         const fetchServiceData = async () => {
             try {
                 const response1 = await axios.get(`/api/dichvu/lay/${id}`);
                 setFormData(response1.data);
-
                 const response2 = await axios.get('/api/danhmuc');
                 const categoryNames = response2.data.map(category => ({
                     id: category._id,
                     name: category.tenDM,
                 }));
-                setCategories(categoryNames); 
+                setCategories(categoryNames);
+
+                if (response1.data.anhDichVu) {
+                    setCoverImage(response1.data.anhDichVu);
+                }
             } catch (error) {
                 console.error("Lỗi khi lấy dữ liệu dịch vụ:", error);
             }
         };
+
         fetchServiceData();
     }, [id]);
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prevData => ({
@@ -46,14 +52,34 @@ function QuanLyDichVu_Edit() {
         }));
     };
 
-    const handleTagsChange = (newTags) => {
+    const handlePackageChange = (e, packageType) => {
+        const { name, value } = e.target;
         setFormData(prevData => ({
             ...prevData,
-            kyNang: newTags // Đảm bảo cập nhật đúng mảng kyNang
+            phanLoai: {
+                ...prevData.phanLoai,
+                [packageType]: {
+                    ...prevData.phanLoai[packageType],
+                    [name]: value
+                }
+            }
         }));
-        console.log("Cập nhật kỹ năng:", newTags); // Kiểm tra đầu ra của kỹ năng mới
     };
-    
+
+    const handleImageChange = (event) => {
+        const file = event.target.files[0];  
+        if (file) {
+            const reader = new FileReader(); 
+            reader.onloadend = () => {
+                setCoverImage(reader.result);  
+                setFormData((prevData) => ({
+                    ...prevData,
+                    anhDichVu: reader.result,  
+                }));
+            };
+            reader.readAsDataURL(file);  
+            }
+        };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -66,115 +92,165 @@ function QuanLyDichVu_Edit() {
         }
     };
 
+    
+
     return (
-        <div className="container mx-auto p-6 bg-gray-50 min-h-screen">
+        <div className="container mx-auto p-6 bg-gradient-to-br min-h-screen">
             <div id="Header" className="mb-6">
                 <Header />
             </div>
             <div id="CategoriesMenu" className="mb-6">
                 <CategoriesMenu />
             </div>
-            <div className="content bg-white p-8 rounded-lg shadow-lg">
-                <h2 className="text-2xl font-semibold mb-6 text-gray-700 flex justify-center">
-                    Chỉnh sửa Dịch vụ
-                </h2>
-                <form className="space-y-4" onSubmit={handleSubmit}>
+            <div className="content bg-white p-8 rounded-xl shadow-2xl max-w-4xl mx-auto">
+                <h2 className="text-3xl font-semibold mb-6 text-gray-800 text-center">Chỉnh sửa dịch vụ</h2>
+                <form className="space-y-6" onSubmit={handleSubmit}>
                     <div>
-                        <label className="block text-gray-600 font-medium mb-1">
-                            Tên Dịch Vụ
-                        </label>
+                        <label className="block text-lg font-medium text-gray-700 mb-2">Tên Dịch Vụ</label>
                         <input
                             type="text"
                             name="tenDichVu"
                             value={formData.tenDichVu}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-1 focus:ring-pink-500"
+                            required
                         />
                     </div>
 
                     <div>
-                        <label className="block text-gray-600 font-medium mb-1">
-                            Mô tả dịch vụ
-                        </label>
-                        <input
-                            type="text"
+                        <label className="block text-lg font-medium text-gray-700 mb-2">Mô tả dịch vụ</label>
+                        <textarea
                             name="moTaDV"
                             value={formData.moTaDV}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-1 focus:ring-pink-500"
+                            required
                         />
                     </div>
 
-                    <div className="container mx-auto mt-10">
-                        <label className="block text-gray-600 font-medium mb-1">
-                            Kỹ năng
-                        </label>
-                        <TagList onTagsChange={handleTagsChange} currentTags={formData.kyNang}/>
-                    </div>
-
-                    <div>
-                        <label className="block text-gray-600 font-medium mb-1">
-                            Giá Tiền
-                        </label>
-                        <input
-                            type="number"
-                            name="giaTien"
-                            value={formData.giaTien}
-                            onChange={handleChange}
-                            className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-gray-600 font-medium mb-1">
-                            Thời Gian Hoàn Thành
+                    <div className="mt-6">
+                        <label className="block text-lg font-medium text-gray-700 mb-2">
+                            Kỹ Năng (nhập các kỹ năng, cách nhau bằng dấu phẩy):
                         </label>
                         <input
                             type="text"
-                            name="thoiGianHoanThanh"
-                            value={formData.thoiGianHoanThanh}
-                            onChange={handleChange}
-                            className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
+                            value={formData.kyNang.join(', ')}
+                            onChange={(e) => {
+                                const newSkills = e.target.value.split(',').map((k) => k.trim());
+                                setFormData((prevData) => ({
+                                    ...prevData,
+                                    kyNang: newSkills
+                                }));
+                            }}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-1 focus:ring-pink-500"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-gray-600 font-medium mb-1">
-                            Trạng Thái
-                        </label>
-                        <input
-                            type="text"
-                            name="trangThaiDV"
-                            value={formData.trangThaiDV}
-                            onChange={handleChange}
-                            className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-400"
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-gray-600 font-medium mb-1">
-                            Danh Mục
-                        </label>
+                        <label className="block text-lg font-medium text-gray-700 mb-2">Danh Mục</label>
                         <select
                             name="idDanhMucDV"
                             value={formData.idDanhMucDV}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-pink-500"
+                            className="uppercase w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-1 focus:ring-pink-500"
                             required
                         >
                             <option value="">Chọn danh mục</option>
                             {categories.map((category) => (
-                                <option key={category.id} value={category.id}>
+                                <option key={category.id} value={category.id} className="uppercase">
                                     {category.name}
                                 </option>
                             ))}
                         </select>
                     </div>
 
+                    <div>
+                        <label className="block text-lg font-medium text-gray-700 mb-2">Trạng thái</label>
+                        <select
+                            name="trangThaiDV"
+                            value={formData.trangThaiDV}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-1 focus:ring-pink-500"
+                            required
+                        >
+                            <option value="">Chọn</option>
+                            <option value="Công khai">Công khai</option>
+                            <option value="Riêng tư">Riêng tư</option>
+                            <option value="Khóa">Khóa</option>
+                        </select>
+                    </div>
+
+                    {/* Inputs for each package */}
+                    {['coban', 'thuong', 'nangcao'].map((packageType, index) => (
+                        <div key={packageType} className="mt-8 bg-gray-100 p-6 rounded-xl shadow-md">
+                            <h3 className="text-xl font-semibold text-gray-800">{`Gói ${index + 1}`}</h3>
+                            <div>
+                                <label className="block text-md font-medium text-gray-700 mt-4">Tên gói</label>
+                                <input
+                                    type="text"
+                                    name="tenLoai"
+                                    value={formData.phanLoai[packageType].tenLoai}
+                                    onChange={(e) => handlePackageChange(e, packageType)}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-1 focus:ring-pink-500"
+                                    required
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-md font-medium text-gray-700 mt-4">Giá gói</label>
+                                <input
+                                    type="number"
+                                    name="giaLoai"
+                                    value={formData.phanLoai[packageType].giaLoai}
+                                    onChange={(e) => handlePackageChange(e, packageType)}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-1 focus:ring-pink-500"
+                                    required
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-md font-medium text-gray-700 mt-4">Mô tả gói</label>
+                                <textarea
+                                    name="moTaLoai"
+                                    value={formData.phanLoai[packageType].moTaLoai}
+                                    onChange={(e) => handlePackageChange(e, packageType)}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-1 focus:ring-pink-500"
+                                    required
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-md font-medium text-gray-700 mt-4">Thời gian hoàn thành</label>
+                                <input
+                                    type="text"
+                                    name="thoiGianDuKien"
+                                    value={formData.phanLoai[packageType].thoiGianDuKien}
+                                    onChange={(e) => handlePackageChange(e, packageType)}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-1 focus:ring-pink-500"
+                                    required
+                                />
+                            </div>
+                        </div>
+                    ))}
+
+                    <div className="mt-8">
+                        <label className="block text-lg font-medium text-gray-700 mb-2">Chọn ảnh đại diện dịch vụ</label>
+                        <input
+                            type="file"
+                            onChange={handleImageChange}
+                            accept="image/*"
+                            className="w-full px-4 py-2 border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-1 focus:ring-pink-500"
+                        />
+                        {coverImage && (
+                            <img src={coverImage} alt="Cover Preview" className="mt-4 max-w-xs rounded-lg shadow-md" />
+                        )}
+                    </div>
+
                     <button
                         type="submit"
-                        className="w-full mt-4 bg-blue-500 text-white font-semibold py-2 rounded-lg hover:bg-blue-600 transition duration-200">
-                        Cập nhật
+                        className="mt-6 w-full px-6 py-2 bg-pink-600 text-white rounded-lg shadow-lg hover:bg-pink-500"
+                    >
+                        Lưu thay đổi
                     </button>
                 </form>
             </div>

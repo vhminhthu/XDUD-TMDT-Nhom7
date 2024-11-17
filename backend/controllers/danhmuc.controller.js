@@ -78,3 +78,14 @@ export const xoaDanhMuc =async(req,res)=>{
 
     }
 }
+
+export const layTheoId = async (req, res) => {
+    const { id } = req.params; 
+    try {
+        const danhmuc = await Danhmuc.findById(id);
+        return res.status(200).json(danhmuc);
+    } catch (error) {
+        res.status(500).json({ error: "Lỗi 500" });
+        console.log("Lỗi layTheoId controller", error.message);
+    }
+}

@@ -14,16 +14,8 @@ function QuanLyDichVu() {
     useEffect(() => {
         const fetchDichvus = async () => {
             try {
-                const response = await axios.get('/api/dichvu');
-                const dichvuName = response.data.map(dichvu => ({
-                    id: dichvu._id,
-                    tenDichVu: dichvu.tenDichVu,
-                    giaTien: dichvu.giaTien,
-                    thoiGianHoanThanh: dichvu.thoiGianHoanThanh,
-                    trangThaiDV: dichvu.trangThaiDV,
-                    updatedAt:dichvu.updatedAt
-                }));
-                setDichvus(dichvuName);
+                const response = await axios.get('/api/dichvu/theonguoidung');
+                setDichvus(response.data);
             } catch (error) {
                 console.error("There was an error fetching the services:", error);
             }
@@ -35,7 +27,7 @@ function QuanLyDichVu() {
     const handleDelete = async (id) => {
         try {
             await axios.delete(`/api/dichvu/${id}`);
-            setDichvus(dichvus.filter(dichvu => dichvu.id !== id));
+            setDichvus(dichvus.filter(dichvu => dichvu._id !== id));
         } catch (error) {
             console.error("There was an error deleting the service:", error);
         }
@@ -67,8 +59,6 @@ function QuanLyDichVu() {
                             <thead>
                                 <tr className="bg-pink-200 text-gray-600 uppercase text-sm leading-normal shadow">
                                     <th className="py-3 px-6 text-left">Tên</th>
-                                    <th className="py-3 px-6 text-left">Giá</th>
-                                    <th className="py-3 px-6 text-left">Thời gian</th>
                                     <th className="py-3 px-6 text-left">Trạng thái</th>
                                     <th className="py-3 px-6 text-left">Ngày cập nhật</th>
                                     <th className="py-3 px-6 text-left"></th>
@@ -76,22 +66,20 @@ function QuanLyDichVu() {
                             </thead>
                             <tbody className="text-gray-700 text-sm font-light">
                                 {dichvus.map((dichvu) => (
-                                        <tr key={dichvu.id} className="border-b border-gray-200 hover:bg-gray-100 ">
-                                            <td className="py-3 px-6 text-left">{dichvu.tenDichVu}</td>
-                                            <td className="py-3 px-6 text-left">{dichvu.giaTien}</td>
-                                            <td className="py-3 px-6 text-left">{dichvu.thoiGianHoanThanh}</td>
+                                        <tr key={dichvu._id} className="border-b border-gray-200 hover:bg-gray-100 ">
+                                            <td className="py-3 px-6 text-left w-1/2">{dichvu.tenDichVu}</td>
                                             <td className="py-3 px-6 text-left">{dichvu.trangThaiDV}</td>
                                             <td className="py-3 px-6 text-left">{new Date(dichvu.updatedAt).toLocaleDateString()}</td>
                                             <th className="py-3 px-6 text-left">
                                                 <div className="flex flex-col text-center">
-                                                    <Link to={`/user/quanlydichvu/list/${dichvu.id}/edit`}>
+                                                    <Link to={`/user/quanlydichvu/list/${dichvu._id}/edit`}>
                                                         <FaRegEdit 
                                                             className="cursor-pointer text-blue-500 hover:text-blue-700" 
                                                         />
                                                     </Link>
                                                     <AiOutlineDelete 
                                                         className="cursor-pointer text-red-500 hover:text-red-700" 
-                                                        onClick={() => handleDelete(dichvu.id)} 
+                                                        onClick={() => handleDelete(dichvu._id)} 
                                                     />
                                                 </div>
                                             </th>

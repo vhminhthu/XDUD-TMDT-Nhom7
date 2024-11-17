@@ -2,59 +2,90 @@ import mongoose from "mongoose";
 
 const dichvuSchema = new mongoose.Schema(
     {
-        tenDichVu:{    //
+        tenDichVu: {
             type: String,
+            required: true,
         },
-        moTaDV:{   //
+        moTaDV: {
             type: String,
+            required: true,
         },
-        giaTien:{   //
-            type: Number,
-        },
-        kyNang:[   //
+        kyNang: [
             {
                 type: String,
             },
         ],
-        thoiGianHoanThanh:{     //
+        phanLoai: {
+            coban: {
+                tenLoai: { type: String },
+                giaLoai: { type: Number },
+                moTaLoai: { type: String },
+                thoiGianDuKien: { type: String },
+            },
+            thuong: {
+                tenLoai: { type: String },
+                giaLoai: { type: Number },
+                moTaLoai: { type: String },
+                thoiGianDuKien: { type: String },
+            },
+            nangcao: {
+                tenLoai: { type: String },
+                giaLoai: { type: Number },
+                moTaLoai: { type: String },
+                thoiGianDuKien: { type: String },
+            },
+        },
+        trangThaiDV: {
+            type: String,
+            required: true,
+        },
+        anhDichVu:{
             type: String,
         },
-        idDanhMucDV:{    //
+        idDanhMucDV: {
             type: mongoose.Schema.Types.ObjectId,
-			ref: "Danhmuc",
+            ref: "Danhmuc",
+            required: true,
         },
-        idNguoiDungDV:{    //
+        idNguoiDungDV: {
             type: mongoose.Schema.Types.ObjectId,
-			ref: "Nguoidung",
+            ref: "Nguoidung",
+            required: true,
         },
-        trangThaiDV:{     //
-            type: String,
-        },
-        danhSachDanhGia:[
-			{
-				soSao: {
-					type: Number,
-					required: true,
-				},
-                noiDung: {
-					type: String,
-					required: true,
+        danhSachDanhGia: [
+            {
+                soSao: {
+                    type: Number,
+                    required: true,
+                    min: 1,
+                    max: 5,
                 },
-				idNguoiDungDG: {
-					type: mongoose.Schema.Types.ObjectId,
-					ref: "Nguoidung",
-					required: true,
-				},
-                ngayDanhGia: { 
-                    type: Date, 
+                noiDung: {
+                    type: String,
+                    required: true,
+                },
+                idNguoiDungDG: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "Nguoidung",
+                    required: true,
+                },
+                ngayDanhGia: {
+                    type: Date,
                     default: Date.now,
-                }
-			},
-		],
+                },
+            },
+        ],
+        soLuongDonHang: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "DonHang",
+                default: [],
+            },
+        ],
     },
-    { timestamps: true } 
+    { timestamps: true }
 );
 
-const Dichvu = mongoose.model("Dichvu", dichvuSchema,"Dichvu");
+const Dichvu = mongoose.model("Dichvu", dichvuSchema, "Dichvu");
 
 export default Dichvu;

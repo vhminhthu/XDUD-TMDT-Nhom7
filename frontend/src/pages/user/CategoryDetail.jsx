@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import axios from 'axios';
 
@@ -7,61 +7,102 @@ import CategoriesMenu from "../../components/user/CategoriesMenu";
 
 function CategoryDetail() {
     const { id } = useParams(); 
-    const navigate = useNavigate()
-    const [dichvus, setdichvu] = useState([]);
+    const navigate = useNavigate();
+    const [dichvu, setDichvu] = useState([]); 
+    const [users, setUsers] = useState({});
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        const fetchCategories = async () => {
+        const fetchDanhmucData = async () => {
             try {
                 const response = await axios.get(`/api/dichvu/theodanhmuc/${id}`);
-                const dichvuName = response.data.map(dichvu => ({
-                    id: dichvu._id,
-                    img: 'https://placehold.co/60x60/FF69B4/FFFFFF',
-                    tenDichVu: dichvu.tenDichVu,
-                    giaTien: dichvu.giaTien
-                }));
-                setdichvu(dichvuName); 
-            } catch (error) {
-                console.error("There was an error fetching the categories:", error);
+                setDichvu(response.data);
+                response.data.forEach(dv => {
+                    fetchUserData(dv.idNguoiDungDV, dv._id);
+                });
+            } catch (err) {
+                console.error(err);
+                setError("Lỗi tải dịch vụ");
+            } finally {
+                setLoading(false);
             }
         };
 
-        fetchCategories();
+        fetchDanhmucData();
     }, [id]);
+
+    const fetchUserData = async (idND, dvId) => {
+        try {
+            const response = await axios.get(`/api/user/layTheoId/${idND}`);
+            setUsers(prevUsers => ({ ...prevUsers, [dvId]: response.data })); 
+        } catch (err) {
+            console.error(err);
+            setError("Failed to load user data.");
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>; 
+    }
+
+    if (error) {
+        return <div className="text-red-600">{error}</div>;
+    }
+
     return (
-        <div className='container'> 
-            <div id="Header">
+        <div className="container mx-auto px-4">
+            {/* Header */}
+            <div id="Header" className="mb-6">
                 <Header />
             </div>
-            <div id="CategoriesMenu">
+            
+            {/* Categories Menu */}
+            <div id="CategoriesMenu" className="mb-8">
                 <CategoriesMenu />
             </div>
-            <div className='content'>
-                <div className="grid grid-cols-3 gap-4 p-6">
-                    {dichvus.map((dichvu) => (
+
+            <div className="content">
+                {dichvu.length === 0 ? (
+                    <div className="text-center text-gray-600 text-lg font-medium">
+                        Không có dịch vụ nào trong danh mục này.
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        {dichvu.map((dv) => (
                             <div
-                                key={dichvu.id}
-                                onClick={() => navigate(`/categories/dichvu/${dichvu.id}`)}
-                                className="bg-white border border-gray-200 rounded-lg shadow p-4"
+                                key={dv._id}
+                                onClick={() => navigate(`/categories/dichvu/${dv._id}`)}
+                                className="bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden transition transform hover:scale-105 hover:shadow-xl"
                             >
-                                    <img
-                                    src={dichvu.img}
-                                    alt={dichvu.tenDichVu}
-                                    className="w-full h-48 object-cover rounded-lg mb-4"
-                                    />
-                                    <h2 className="text-lg font-bold mb-2">{dichvu.tenDichVu}</h2>
-                                    <div className="flex items-center justify-between mb-2">
-                                    <div className="text-xl font-semibold text-gray-700">
-                                        ₫{dichvu.giaTien}
+                                <img
+                                    src={dv.anhDichVu || 'https://placehold.co/60x60/FF69B4/FFFFFF'}
+                                    alt={dv.tenDichVu || 'Dich vu image'}
+                                    className="w-full h-48 object-cover rounded-t-lg"
+                                />
+                                <div className="p-4">
+                                    <div className='flex mb-3'>
+                                        <img
+                                            alt="Profile picture" 
+                                            className="rounded-full w-6 h-6 mr-2" 
+                                            src={users[dv._id]?.anhND || "https://placehold.co/20x20/FF69B4/FFFFFF"}
+                                        />
+                                        <h1 className='text-lg font-semibold'>{users[dv._id]?.tenNguoiDung || "Tên người dùng không có"}</h1>
+                                    </div>
+                                    <h2 className="text-lg text-gray-800 mb-2 capitalize">{dv.tenDichVu}</h2>
+                                    <div className="flex items-center justify-between">
+                                        <div className="text-xl font-bold text-green-600">
+                                            Từ {dv.phanLoai?.coban?.giaLoai?.toLocaleString() || 'N/A'} đ
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
             </div>
-
         </div>
-    )
+    );
 }
 
-export default CategoryDetail
+export default CategoryDetail;
