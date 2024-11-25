@@ -10,7 +10,8 @@ import danhmucRoutes from "./routes/danhmuc.route.js"
 import dichvuRoutes from "./routes/dichvu.route.js"
 import userRoutes from "./routes/nguoidung.route.js"
 import giohangRoutes from "./routes/giohang.route.js"
-
+import donhangRoutes from "./routes/donhang.route.js"
+import vnpayRoutes from "./routes/vnpay.route.js"
 
 dotenv.config()
 
@@ -37,6 +38,8 @@ app.use("/api/auth",authRoutes )
 app.use("/api/danhmuc",danhmucRoutes )
 app.use("/api/dichvu",dichvuRoutes )
 app.use("/api/giohang",giohangRoutes )
+app.use("/api/donhang",donhangRoutes )
+app.use("/api/vnpay",vnpayRoutes )
 
 app.get("/", (req, res) => {
     res.send("Xin chào bạn");

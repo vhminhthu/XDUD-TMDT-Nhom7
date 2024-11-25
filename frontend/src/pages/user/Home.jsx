@@ -5,11 +5,14 @@ import Header from "../../components/user/Header";
 
 function Home() {
     return (
-        <div className='container'> 
-            <div id="Header">
+        <div className="container mx-auto px-4">
+            {/* Header */}
+            <div id="Header" className="mb-6">
                 <Header />
             </div>
-            <div id="CategoriesMenu">
+            
+            {/* Categories Menu */}
+            <div id="CategoriesMenu" className="mb-8">
                 <CategoriesMenu />
             </div>
             <div className='content'>

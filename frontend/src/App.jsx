@@ -17,6 +17,8 @@ import QuanLyDichVu_Add from './pages/user/QuanLyDichVu_Add';
 import DichVuDetail from './pages/user/DichVuDetail';
 import Dangky from './pages/user/DangKy';
 import Dangnhap from './pages/user/DangNhap';
+import PaymentResult from './pages/user/PaymentResult';
+import QuanLyDonDatHang from './pages/user/QuanLyDonDatHang';
 
 function App() {
   const { data: authUser, isLoading } = useQuery({
@@ -54,7 +56,10 @@ function App() {
       <Route path="/user/quanlydichvu/list" element={<QuanLyDichVu/>} />
       <Route path="/user/quanlydichvu/list/:id/edit" element={<QuanLyDichVu_Edit/>} />
       <Route path="/user/quanlydichvu/list/add" element={<QuanLyDichVu_Add/>} />
+      <Route path="/user/quanlydondathang/list" element={<QuanLyDonDatHang/>} />
+
       <Route path="/categories/dichvu/:id" element={<DichVuDetail/>} />
+      <Route path="/payment-result" element={<PaymentResult />} />
 
       {/* Trang đăng nhập và đăng ký */}
       <Route path="/dangky" element={!authUser ? <Dangky /> : <Navigate to="/" />} />

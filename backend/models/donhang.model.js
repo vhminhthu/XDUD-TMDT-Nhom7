@@ -8,27 +8,39 @@ const donhangSchema = new mongoose.Schema(
         tongTien:{
             type: Number,
         },
-        idDichVuDH:{
+        dichVuId: {
             type: mongoose.Schema.Types.ObjectId,
-			ref: "Dichvu",
+            ref: "Dichvu",
+        },
+        phanLoai: {
+            tenLoai: { type: String },
+            giaLoai: { type: Number },
+            moTaLoai: { type: String },
+            thoiGianDuKien: { type: String },
+        },
+        soLuong: {
+            type: Number,
         },
         khachHangId: {
             type: mongoose.Schema.Types.ObjectId,
 			ref: "Nguoidung",
         },
-        phuongThucThanhToan:{
-            type: String,
+        nguoiBanId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Nguoidung",
         },
-        trangThaiThanhToan:{
-            type: String,
-        },
-        thoiGianThanhToan:{
-            type: Date,
+        giaoDich: {
+            maGiaoDich: { type: Number },
+            trangThaiThanhToan: { type: String },
+            loaiThanhToan: { type: String },
+            loaiThe: { type: String },
+            loaiGiaoDich: { type: String },
+            createdAt: { type: Date },
         },
     },
     { timestamps: true } 
 );
 
-const Donhang = mongoose.model("Donhang", donhangSchema);
+const Donhang = mongoose.model("Donhang", donhangSchema, "Donhang");
 
 export default Donhang;

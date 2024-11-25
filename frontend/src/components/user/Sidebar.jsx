@@ -39,11 +39,19 @@ function Sidebar() {
                 </div>
             </Link>
             {user.vaiTro === "freelancer" && (
-                <Link to={'/user/quanlydichvu/list'}>
-                    <div className="flex justify-center items-center bg-pink-200 hover:bg-pink-100 rounded-lg p-4 mt-3 shadow-md cursor-pointer transition duration-200 ease-in-out">
-                        <span className="text-gray-700">Quản lý dịch vụ</span>
-                    </div>
-                </Link>
+                <>
+                    <Link to={'/user/quanlydichvu/list'}>
+                        <div className="flex justify-center items-center bg-pink-200 hover:bg-pink-100 rounded-lg p-4 mt-3 shadow-md cursor-pointer transition duration-200 ease-in-out">
+                            <span className="text-gray-700">Quản lý dịch vụ</span>
+                        </div>
+                    </Link>
+
+                    <Link to={'/user/quanlydondathang/list'}>
+                        <div className="flex justify-center items-center bg-pink-200 hover:bg-pink-100 rounded-lg p-4 mt-3 shadow-md cursor-pointer transition duration-200 ease-in-out">
+                            <span className="text-gray-700">Quản lý đơn hàng</span>
+                        </div>
+                    </Link>
+                </>
             )}
         </>
     )

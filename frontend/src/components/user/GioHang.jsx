@@ -38,21 +38,44 @@ export default function GioHang() {
         }
     };
 
-    async function handlePayment() {
+    const handlePayment = async () => {
         try {
-            const total = tong();
-            const newPayment = {
-                products: [giohang.dichVu],
-                amount: total,
-                bankCode: null,
-                language: "vn",
+            const giaoDich = {
+                dichVuId: giohang.dichVu.dichVuId,
+                soLuong: giohang.dichVu.soLuong,
+                phanLoai: {
+                    tenLoai: giohang.dichVu.phanLoai.tenLoai,
+                    giaLoai: giohang.dichVu.phanLoai.giaLoai,
+                    moTaLoai: giohang.dichVu.phanLoai.moTaLoai,
+                    thoiGianDuKien: giohang.dichVu.phanLoai.thoiGianDuKien,
+                },
+                tongTien: tong(),
             };
-            const response = await Axios.post('/api/vnpay/create_payment_url', newPayment);
-            if (response.status === 200 && response.data){
-                window.location.href = response.data;
+    
+            const orderResponse = await Axios.post('/api/donhang/themdonhang', giaoDich);
+            if (orderResponse.status === 201) {
+    
+                const donhangId = orderResponse.data.donhangId; 
+                console.log('donhangId:', donhangId);
+                alert(`Thêm thành công! DonhangId: ${donhangId}`);
+    
+                const newPayment = {
+                    amount: tong(),
+                    bankCode: null,
+                    language: "vn",
+                    donhangId: donhangId,
+                };
+    
+                const paymentResponse = await Axios.post('/api/vnpay/create_payment_url', newPayment);
+                if (paymentResponse.status === 200 && paymentResponse.data) {
+                    window.location.href = paymentResponse.data;
+                }
+            } else {
+                alert("Có lỗi xảy ra khi thêm dịch vụ, vui lòng thử lại.");
             }
         } catch (error) {
-            alert(`Lỗi: ${error?.message}`)
+            console.error('Lỗi khi thêm đơn hàng:', error);
+            alert(`Lỗi: ${error?.message}`);
         }
     };
 

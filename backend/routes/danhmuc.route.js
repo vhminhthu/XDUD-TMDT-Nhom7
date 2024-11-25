@@ -9,4 +9,5 @@ router.post("/them",themDanhMuc)
 router.patch("/chinh/:id",suaDanhMuc)
 router.delete("/:id",xoaDanhMuc)
 router.get("/layTheoId/:id",layTheoId)
+
 export default router

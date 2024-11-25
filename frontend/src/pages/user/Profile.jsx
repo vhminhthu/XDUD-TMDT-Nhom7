@@ -26,11 +26,11 @@ function Profile() {
     if (error) return <div>{error}</div>;
     if (!user) return <div>Đang tải...</div>;
     return (
-        <div className='container'> 
-            <div id="Header">
+        <div className='container mx-auto px-4'> 
+            <div id="Header" className="mb-6">
                 <Header />
             </div>
-            <div id="CategoriesMenu">
+            <div id="CategoriesMenu" className="mb-8">
                 <CategoriesMenu />
             </div>
             <div className='content p-8 flex'> 
