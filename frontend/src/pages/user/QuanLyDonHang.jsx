@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import moment from 'moment';
 
-function QuanLyDonDatHang() {
+function QuanLyDonHang() {
     const [donhang, setDonhang] = useState([]);
     const [trangThaiDH, setTrangThaiDH] = useState("Chờ xác nhận")
     const [hienThiChiTiet, setHienThiChiTiet] = useState(false);
@@ -19,8 +19,7 @@ function QuanLyDonDatHang() {
         try {
             setDonhang([]);
 
-            const response = await axios.get(`/api/donhang/laydonhangcuanguoiban/${trangThaiDH}`);
-            console.log(response.data);
+            const response = await axios.get(`/api/donhang/laydonhangcuanguoimua/${trangThaiDH}`);
             setDonhang(response.data);      
         } catch (error) {
             console.error("Lỗi khi tải dữ liệu đơn hàng:", error);
@@ -83,7 +82,7 @@ function QuanLyDonDatHang() {
                                     <tr className="bg-pink-200 text-gray-600 text-sm leading-normal shadow">
                                         <th className="py-3 px-6 text-center w-1/12">stt</th>
                                         <th className="py-3 px-6 text-center w-1/6">Thời gian</th>
-                                        <th className="py-3 px-6 text-center w-1/12">Khách hàng</th>
+                                        <th className="py-3 px-6 text-center w-1/12">Người bán</th>
                                         <th className="py-3 px-6 text-center w-1/3">Dịch vụ</th>
                                         <th className="py-3 px-6 text-center w-1/6">Tên loại</th>
                                         <th className="py-3 px-6 text-center w-1/2"></th>
@@ -94,35 +93,34 @@ function QuanLyDonDatHang() {
                                         <tr key={donhang._id} className="donhang_button border-b border-gray-200 hover:bg-gray-100" onClick={() => xulyXemChiTiet(donhang)}>
                                             <td className="py-3 px-6 text-center">{index+1}</td>
                                             <td className="py-3 px-6 text-center">{moment(donhang.createdAt).format('YYYY-MM-DD hh:mm')}</td>
-                                            <td className="py-3 px-6 text-center">{donhang.khachHangId?.tenNguoiDung}</td>
+                                            <td className="py-3 px-6 text-center">{donhang.nguoiBanId?.tenNguoiDung}</td>
                                             <td className="py-3 px-6 text-left">{donhang.dichVuId?.tenDichVu}</td>
                                             <td className="py-3 px-6 text-center">{donhang.phanLoai?.tenLoai}</td>
                                             <td className="py-3 px-6 text-center">
-                                            {donhang.trangThaiDH === "Chờ xác nhận" && (
+                                            {(donhang.trangThaiDH === "Chờ xác nhận") && (
+                                                <span className="text-gray-400">Chờ xác nhận</span>
+                                            )}
+                                            {(donhang.trangThaiDH === "Đã xác nhận") && (
+                                                <span className="text-gray-400">Đang thực hiện</span>
+                                            )}
+                                            {donhang.trangThaiDH === "Đã hoàn thành" && (
                                                 <button
                                                     className="text-xs bg-yellow-200 hover:bg-yellow-300 text-yellow-800 font-semibold py-1 px-3 rounded-lg shadow"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        handleCapNhatTrangThaiChange(donhang._id, "Đã xác nhận");
+                                                        handleCapNhatTrangThaiChange(donhang._id, "Đã kết thúc");
                                                     }}
                                                 >
-                                                    Xác nhận
+                                                    Đã nhận sản phẩm
                                                 </button>
                                             )}
 
-                                            {donhang.trangThaiDH === "Đã xác nhận" && (
+                                            {(donhang.trangThaiDH === "Đã kết thúc") && (
                                                 <button
-                                                    className="text-xs bg-blue-200 hover:bg-blue-300 text-blue-800 font-semibold py-2 px-4 rounded-lg shadow"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleCapNhatTrangThaiChange(donhang._id, "Đã hoàn thành");
-                                                    }}                                                >
-                                                    Hoàn thành
+                                                    className="text-xs border border-pink-300 text-yellow-800 font-semibold py-1 px-3 rounded-lg shadow"
+                                                >
+                                                    Đánh giá
                                                 </button>
-                                            )}
-
-                                            {(donhang.trangThaiDH === "Đã hoàn thành" || donhang.trangThaiDH === "Đã kết thúc") && (
-                                                <span className="text-gray-400">Đã hoàn thành</span>
                                             )}
                                             </td>
                                         </tr>
@@ -136,7 +134,7 @@ function QuanLyDonDatHang() {
                 {hienThiChiTiet && chiTietDonHang && (
                     <div id="Chitiet" className="absolute bg-white border rounded shadow-lg top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-4 w-1/2 max-h-96 overflow-y-auto">
                         <h2 className="font-semibold text-lg mb-4">Chi tiết đơn hàng</h2>
-                        <p><strong>Khách hàng:</strong> {chiTietDonHang.khachHangId?.tenNguoiDung}</p>
+                        <p>{chiTietDonHang.nguoiBanId?.tenNguoiDung}</p>
                         <p><strong>Danh mục:</strong> {chiTietDonHang.dichVuId?.idDanhMucDV?.tenDM}</p>
                         <p><strong>Dịch vụ:</strong> {chiTietDonHang.dichVuId?.tenDichVu}</p>
                         <p><strong>Thời gian đặt:</strong> {moment(chiTietDonHang.createdAt).format('YYYY-MM-DD hh:mm')}</p>
@@ -159,4 +157,4 @@ function QuanLyDonDatHang() {
     );
 }
 
-export default QuanLyDonDatHang;
+export default QuanLyDonHang;

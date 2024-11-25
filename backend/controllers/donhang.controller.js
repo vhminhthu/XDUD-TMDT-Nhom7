@@ -1,6 +1,8 @@
 import Donhang from "../models/donhang.model.js";
 import Dichvu from "../models/dichvu.model.js";
 import Nguoidung from "../models/nguoidung.model.js";
+import Danhmuc from "../models/danhmuc.model.js";
+
 import mongoose from "mongoose";
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -137,15 +139,22 @@ export const layGiaoDich = async (req, res) => {
 export const layDonHangCuaNguoiBan = async (req, res) => {
     try {
         const nguoiBanId = req.nguoidung._id;
-        // Lấy giá trị trangThaiDH từ query parameters
-        const { trangThaiDH } = req.params; // Lấy giá trị trạng thái từ URL
+        const { trangThaiDH } = req.params;
 
-        // Tạo điều kiện lọc
         const filter = { nguoiBanId };
         if (trangThaiDH) {
             filter.trangThaiDH = trangThaiDH;
         }
-        const donhangs = await Donhang.find(filter).populate("dichVuId").populate("khachHangId");
+        const donhangs = await Donhang.find(filter)
+            .populate("dichVuId")
+            .populate("khachHangId")
+            .populate({
+                path: "dichVuId",
+                populate: {
+                    path: "idDanhMucDV",
+                    model: "Danhmuc"
+                }
+            });
 
         if (!donhangs || donhangs.length === 0) {
             return res.status(404).json({ error: 'Không có đơn hàng nào của người bán này.' });
@@ -189,5 +198,60 @@ export const capNhatTrangThai = async (req, res) => {
             message: "Có lỗi xảy ra khi cập nhật giao dịch.",
             error: error.message,
         });
+    }
+};
+
+export const layDonHangCuaNguoiMua = async (req, res) => {
+    try {
+        const nguoiMuaId = req.nguoidung._id;
+        const { trangThaiDH } = req.params;
+
+        const filter = {
+            khachHangId: nguoiMuaId,
+            "giaoDich.trangThaiThanhToan": "Thành công",
+        };
+
+        if (trangThaiDH) {
+            filter.trangThaiDH = trangThaiDH;
+        }
+
+        const donhangs = await Donhang.find(filter)
+            .populate("dichVuId")
+            .populate("nguoiBanId")        
+            .populate({
+                path: "dichVuId",
+                populate: {
+                    path: "idDanhMucDV",
+                    model: "Danhmuc"
+                }
+            });
+
+        if (!donhangs || donhangs.length === 0) {
+            return res.status(404).json({ error: 'Không có đơn hàng nào của người mua này.' });
+        }
+
+        res.status(200).json(donhangs);
+    } catch (error) {
+        console.error("Lỗi khi lấy đơn hàng của người mua:", error.message);
+        return res.status(500).json({
+            success: false,
+            message: "Có lỗi xảy ra khi lấy đơn hàng.",
+            error: error.message,
+        });
+    }
+};
+
+export const layTatCaDonHangCuaNguoiMua = async (req, res) => {
+    const idNguoiDung = req.nguoidung._id;
+    try {
+        const gioHang = await Donhang.find({ khachHangId: idNguoiDung })
+            .populate('dichVuId');
+
+        const soLuongDonHang = await Donhang.countDocuments({ khachHangId: idNguoiDung });
+
+        res.status(200).json({ gioHang, soLuongDonHang });
+    } catch (error) {
+        res.status(500).json({ error: "Internal server error" });
+        console.error("Error in layTatCaDonHangCuaNguoiMua controller", error);
     }
 };

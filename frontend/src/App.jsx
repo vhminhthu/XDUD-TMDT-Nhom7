@@ -19,6 +19,7 @@ import Dangky from './pages/user/DangKy';
 import Dangnhap from './pages/user/DangNhap';
 import PaymentResult from './pages/user/PaymentResult';
 import QuanLyDonDatHang from './pages/user/QuanLyDonDatHang';
+import QuanLyDonHang from './pages/user/QuanLyDonHang';
 
 function App() {
   const { data: authUser, isLoading } = useQuery({
@@ -57,6 +58,8 @@ function App() {
       <Route path="/user/quanlydichvu/list/:id/edit" element={<QuanLyDichVu_Edit/>} />
       <Route path="/user/quanlydichvu/list/add" element={<QuanLyDichVu_Add/>} />
       <Route path="/user/quanlydondathang/list" element={<QuanLyDonDatHang/>} />
+      <Route path="/user/quanlydonhang/list" element={<QuanLyDonHang/>} />
+
 
       <Route path="/categories/dichvu/:id" element={<DichVuDetail/>} />
       <Route path="/payment-result" element={<PaymentResult />} />

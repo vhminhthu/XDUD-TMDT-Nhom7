@@ -38,6 +38,11 @@ function Sidebar() {
                     <span className="text-gray-700">Thông tin</span>
                 </div>
             </Link>
+            <Link to={'/user/quanlydonhang/list'}>
+                <div className="flex justify-center items-center bg-pink-200 hover:bg-pink-100 rounded-lg p-4 mt-3 mb-10 shadow-md cursor-pointer transition duration-200 ease-in-out">
+                    <span className="text-gray-700">Quản lý đơn hàng</span>
+                </div>
+            </Link>
             {user.vaiTro === "freelancer" && (
                 <>
                     <Link to={'/user/quanlydichvu/list'}>
@@ -48,7 +53,7 @@ function Sidebar() {
 
                     <Link to={'/user/quanlydondathang/list'}>
                         <div className="flex justify-center items-center bg-pink-200 hover:bg-pink-100 rounded-lg p-4 mt-3 shadow-md cursor-pointer transition duration-200 ease-in-out">
-                            <span className="text-gray-700">Quản lý đơn hàng</span>
+                            <span className="text-gray-700">Quản lý đơn đặt hàng</span>
                         </div>
                     </Link>
                 </>

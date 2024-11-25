@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import axios from 'axios';
 import { useQueryClient } from '@tanstack/react-query'; 
 import { useNavigate } from 'react-router-dom';
+import HeaderDonHang from "./HeaderDonHang";
 
 function Header() {
     const [hienthiThongBao, setHienThiThongBao] = useState(false);
@@ -142,7 +143,7 @@ function Header() {
 
             <div>
                 {hienthiThongBao && (
-                    <div id="Thongbao" className="absolute right-5 w-64 bg-white border rounded shadow-lg">
+                    <div id="Thongbao" className="absolute right-5 w-64 bg-white border rounded shadow-lg z-50">
                         <div className="border-b px-4 py-2">
                             <h2 className="text-lg font-semibold">Thông báo (1)</h2>
                         </div>
@@ -156,7 +157,7 @@ function Header() {
                 )}
 
                 {hienthiTinNhan && (
-                    <div id="Tinnhan" className="absolute right-5 w-64 bg-white border rounded shadow-lg">
+                    <div id="Tinnhan" className="absolute right-5 w-64 bg-white border rounded shadow-lg z-50">
                         <div className="border-b px-4 py-2">
                             <h2 className="text-lg font-semibold">Tin nhắn (1)</h2>
                         </div>
@@ -167,22 +168,17 @@ function Header() {
                 )}
 
                 {hienthiDonHang && (
-                    <div id="Donhang" className="absolute right-5 w-64 bg-white border rounded shadow-lg">
-                        <div className="border-b px-4 py-2">
-                            <h2 className="text-lg font-semibold">Đơn hàng (1)</h2>
-                        </div>
-                        <div className="p-4 flex items-start justify-center space-x-4">
-                            <p className="text-sm text-gray-700">Chưa có đơn hàng nào</p>
-                        </div>
-                    </div>
+                    <HeaderDonHang/>
                 )}
 
                 {hienthiNguoiDung && (
                     <div id="Nguoidung" className="absolute right-5 w-64 bg-white border rounded shadow-lg z-50">
                         <div className="px-4 py-2">
-                            <div className="flex-1">
+                            <div className="flex flex-col">
                                 <Link to={'/user/profile'} className="text-lg mb-2 text-gray-700 hover:text-pink-600">Hồ sơ</Link>
-                                <p className="text-lg text-gray-700 hover:text-pink-600 cursor-pointer">Yêu cầu đặt hàng</p>
+                                {user.vaiTro === "freelancer" && (
+                                    <Link to={'/user/quanlydondathang/list'} className="text-lg mb-2 text-gray-700 hover:text-pink-600">Yêu cầu đặt hàng</Link>
+                                )}
                             </div>
                         </div>
                         <div className="border-t px-4 py-2">
