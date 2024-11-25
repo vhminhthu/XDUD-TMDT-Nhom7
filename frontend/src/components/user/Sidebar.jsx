@@ -1,10 +1,13 @@
 import { Link } from "react-router-dom";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
 function Sidebar() {
     const [user, setUser] = useState(null);
     const [error, setError] = useState(null);
+    const [coverImage, setCoverImage] = useState(null);
+    const fileInputRef = useRef(null);
+
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -20,16 +23,49 @@ function Sidebar() {
         fetchUserData();
     }, []);
 
+
+    const handleImageChange = async (event) => {
+        const file = event.target.files[0];  
+        if (file) {
+            const reader = new FileReader(); 
+            reader.onloadend = async () => {
+                setCoverImage(reader.result);  
+                try {
+                    const response = await axios.patch('/api/user/update', {
+                        anhND: reader.result, 
+                    });
+                    setUser(response.data.nguoidung);
+                } catch (err) {
+                    setError('Không thể cập nhật ảnh đại diện. Vui lòng thử lại.');
+                    console.error(err);
+                }
+            };
+            reader.readAsDataURL(file);  
+        }
+    };
+
+
+    const handleAvatarClick = () => {
+        fileInputRef.current.click();
+    };
+
     if (error) return <div className="text-red-500 text-center mt-4">{error}</div>;
     if (!user) return <div className="flex justify-center items-center mt-4"><div className="loader">Đang tải...</div></div>; 
 
     return (
         <>
-            <div className="avata flex items-center justify-center">
+            <div className="avata flex items-center justify-center" onClick={handleAvatarClick}>
                 <img 
-                    src="https://placehold.co/60x60/FF69B4/FFFFFF" 
+                    src={coverImage || user.anhND || "https://placehold.co/60x60/FF69B4/FFFFFF"} 
                     className="w-20 h-20 mx-2 rounded-full shadow-lg border-2 border-white" 
                     alt="Avatar"
+                />
+                <input
+                    type="file"
+                    accept="image/*"
+                    ref={fileInputRef}
+                    className="hidden"
+                    onChange={handleImageChange}
                 />
             </div>
             <p className="text-center text-lg font-semibold mt-3">{user.tenNguoiDung}</p>
@@ -59,7 +95,7 @@ function Sidebar() {
                 </>
             )}
         </>
-    )
+    );
 }
 
 export default Sidebar;
