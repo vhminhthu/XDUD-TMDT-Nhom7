@@ -49,7 +49,6 @@ export const layTheoId = async (req, res) => {
     }
 }
 
-
 export const capNhat = async (req, res) => {
     const { tenNguoiDung, email, diaChi, soDienThoai } = req.body;
     let { anhND } = req.body; 

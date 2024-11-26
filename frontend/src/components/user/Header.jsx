@@ -124,12 +124,12 @@ function Header() {
                             <div className="nguoidung_button flex items-center rounded-full cursor-pointer" onClick={xulyNguoiDung}>
                                 <div className="header-avata flex items-center">
                                     <img 
-                                        src="https://placehold.co/40x40/FF69B4/FFFFFF" 
+                                        src={user?.anhND || "https://placehold.co/20x20/FF69B4/FFFFFF"}
                                         className="block md:hidden w-5 h-5 mx-2 rounded-full " 
                                         alt="Avatar Small"
                                     />
                                     <img 
-                                        src="https://placehold.co/60x60/FF69B4/FFFFFF" 
+                                        src={user?.anhND || "https://placehold.co/20x20/FF69B4/FFFFFF"}
                                         className="hidden md:block w-10 h-10 mx-2 rounded-full " 
                                         alt="Avatar Large"
                                     />

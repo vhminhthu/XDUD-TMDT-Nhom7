@@ -210,7 +210,7 @@ export const idDichvu = async (req, res) => {
     const { id } = req.params; 
     console.log(id)
     try {   
-        const dichvu = await Dichvu.findById(id);
+        const dichvu = await Dichvu.findById(id).populate("idDanhMucDV").populate("idNguoiDungDV");
         if (!dichvu) {
             return res.status(404).json({ message: 'Dịch vụ không tồn tại' });
         }

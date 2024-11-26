@@ -9,8 +9,6 @@ import { FaRegClock } from "react-icons/fa";
 function DichVuDetail() {
     const { id } = useParams();
     const [dichvu, setDichvu] = useState(null);
-    const [user, setUser] = useState(null);
-    const [danhmuc, setDanhmuc] = useState(null);
     const [loading, setLoading] = useState(true);
     const [selectedPackage, setSelectedPackage] = useState('coban');
     const [hienthiGiohang, setHienthiGiohang] = useState(false);
@@ -28,13 +26,6 @@ function DichVuDetail() {
         };
     }, [id]);
 
-    useEffect(() => {
-        if (dichvu) {
-            fetchUserData(dichvu.idNguoiDungDV);
-            fetchDanhmucData(dichvu.idDanhMucDV);
-        }
-    }, [dichvu]);
-
     const handlePackageChange = (packageType) => {
         setSelectedPackage(packageType);
     };
@@ -47,24 +38,6 @@ function DichVuDetail() {
         } catch (error) {
             console.error("Lỗi khi tải dịch vụ:", error);
             setLoading(false);
-        }
-    };
-
-    const fetchUserData = async (idND) => {
-        try {
-            const response = await Axios.get(`/api/user/layTheoId/${idND}`);
-            setUser(response.data);
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-    const fetchDanhmucData = async (idDM) => {
-        try {
-            const response = await Axios.get(`/api/danhmuc/layTheoId/${idDM}`);
-            setDanhmuc(response.data);
-        } catch (err) {
-            console.error(err);
         }
     };
     
@@ -106,7 +79,7 @@ function DichVuDetail() {
                 <div className='w-full pt-10 pr-12 pl-9'>
                     <nav className="text-sm text-gray-600 mb-4">
                         <a className="hover:underline capitalize mr-1" href="#">
-                            {danhmuc?.tenDM || 'Tên danh mục'}
+                            {dichvu?.idDanhMucDV?.tenDM || 'Tên danh mục'}
                         </a>
                         / 
                         <a className="hover:underline capitalize ml-1" href="#">
@@ -120,11 +93,11 @@ function DichVuDetail() {
                         <img
                         alt="Profile picture of the developer" 
                         className="rounded-full w-16 h-16 mr-4" 
-                        src={user?.anhND ? user.anhND : "https://placehold.co/20x20/FF69B4/FFFFFF"}
+                        src={dichvu?.idNguoiDungDV?.anhND ? dichvu?.idNguoiDungDV?.anhND : "https://placehold.co/20x20/FF69B4/FFFFFF"}
                         />
                         <div>
                             <h3 className="text-xl font-bold">
-                                {user?.tenNguoiDung || 'Tên người dùng'}
+                                {dichvu?.idNguoiDungDV?.tenNguoiDung || 'Tên người dùng'}
                             </h3>
                             <div className="flex items-center mb-2">
                                 <span className="text-yellow-500">

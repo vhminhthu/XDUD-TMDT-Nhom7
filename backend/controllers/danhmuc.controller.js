@@ -38,9 +38,6 @@ export const themDanhMuc = async (req, res) => {
 	}
 };
 
-
-
-
 export const suaDanhMuc = async (req, res) => {
     const { tenDM } = req.body
 
