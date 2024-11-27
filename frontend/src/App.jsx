@@ -52,7 +52,11 @@ function App() {
       <Route path="/yeuthich" element={<YeuThich/>} />
       <Route path="/freelancer/overview" element={<FreelancerOverview/>} />
       <Route path="/freelancer/info" element={<FreelancerInfo/>} />
-      <Route path="/categories/:id" element={<CategoryDetail/>} />
+
+      <Route path="/categories/:tn" element={<CategoryDetail/>} />
+
+      <Route path="/:nd/:tndv" element={<DichVuDetail/>} />
+
       <Route path="/user/profile" element={<UserProfile/>} />
       <Route path="/user/quanlydichvu/list" element={<QuanLyDichVu/>} />
       <Route path="/user/quanlydichvu/list/:id/edit" element={<QuanLyDichVu_Edit/>} />
@@ -60,8 +64,6 @@ function App() {
       <Route path="/user/quanlydondathang/list" element={<QuanLyDonDatHang/>} />
       <Route path="/user/quanlydonhang/list" element={<QuanLyDonHang/>} />
 
-
-      <Route path="/categories/dichvu/:id" element={<DichVuDetail/>} />
       <Route path="/payment-result" element={<PaymentResult />} />
 
       {/* Trang đăng nhập và đăng ký */}

@@ -84,6 +84,14 @@ export const themDichVu = async (req, res) => {
         danhMuc.idDichVuDM.push(dichVuMoi._id); 
         await danhMuc.save();
 
+        const nguoiDung = await Nguoidung.findById(idNguoiDungDV);
+            if (!nguoiDung) {
+                return res.status(404).json({ message: "nguoiDung không tồn tại." });
+            }
+
+        nguoiDung.idDichVuND.push(dichVuMoi._id); 
+        await nguoiDung.save();
+
         res.status(201).json(dichVuMoi);
 
     } catch (error) {
@@ -173,6 +181,17 @@ export const suaDichVu = async (req, res) => {
 
         dichvu = await dichvu.save();
 
+        const nguoiDung = await Nguoidung.findById(dichvu.idNguoiDungDV);
+
+        if (!nguoiDung) {
+            return res.status(404).json({ message: "Người dùng không tồn tại." });
+        }
+        
+            if (!nguoiDung.idDichVuND.includes(dichvu._id)) {
+                nguoiDung.idDichVuND.push(dichvu._id);
+                await nguoiDung.save();
+            }
+
         return res.status(200).json({ dichvu });
     } catch (error) {
         console.log("Lỗi suaDichVu controller", error.message);
@@ -208,7 +227,6 @@ export const xoaDichVu = async (req, res) => {
 
 export const idDichvu = async (req, res) => {
     const { id } = req.params; 
-    console.log(id)
     try {   
         const dichvu = await Dichvu.findById(id).populate("idDanhMucDV").populate("idNguoiDungDV");
         if (!dichvu) {
@@ -223,19 +241,52 @@ export const idDichvu = async (req, res) => {
 
 export const DichvutheoDM = async (req, res) => {
     const { id } = req.params; 
+    const { sort = "phobien", page = 1, limit = 4 } = req.query;
+
+    const pageSize = parseInt(limit);
+    const skip = (page - 1) * pageSize;
     try {
-        const danhmuc = await Danhmuc.findById(id);
-        if (!danhmuc) {
-            return res.status(404).json({ message: 'Danh mục không tồn tại' });
+        const tong = await Dichvu.countDocuments({ idDanhMucDV: id, trangThaiDV: 'Công khai' });
+        const tongPage = Math.ceil(tong / pageSize);
+
+        let sortQuery;
+        switch (sort) {
+            case 'phobien':
+                sortQuery = { luotXem: -1 }; // Sắp xếp theo lượt xem (giảm dần)
+                break;
+            case 'moinhat':
+                sortQuery = { createdAt: -1 }; // Sắp xếp theo ngày tạo (mới nhất)
+                break;
+            case 'nhieunguoidat':
+                sortQuery = { soLuongDonHang: -1 }; // Sắp xếp theo số lượng đơn hàng (giảm dần)
+                break;
+            case 'giatang':
+                sortQuery = { 'phanLoai.coban.giaLoai': 1 }; // Sắp xếp theo giá (tăng dần)
+                break;
+            case 'giagiam':
+                sortQuery = { 'phanLoai.coban.giaLoai': -1 }; // Sắp xếp theo giá (tăng dần)
+                break;
+            default:
+                sortQuery = { luotXem: -1 }; // Mặc định sắp xếp theo lượt xem (giảm dần)
+                break;
         }
 
-        const dichvu = await Dichvu.find({ idDanhMucDV: id, trangThaiDV: 'Công khai'});
+        const dichvu = await Dichvu.find({ idDanhMucDV: id, trangThaiDV: 'Công khai'})
+        .populate("idNguoiDungDV")
+        .populate("idDanhMucDV")
+        .sort(sortQuery)
+        .skip(skip)
+        .limit(pageSize);
 
         if (dichvu.length === 0) {
             return res.status(404).json({ message: 'Không có dịch vụ công khai trong danh mục này' });
         }
 
-        return res.status(200).json(dichvu);
+        return res.status(200).json({
+            tong,
+            dichvu,
+            tongPage,
+        });
     } catch (error) {
         res.status(500).json({ error: "Lỗi 500" });
         console.log("Lỗi DichvutheoDM controller", error.message);
@@ -244,13 +295,27 @@ export const DichvutheoDM = async (req, res) => {
 
 export const layTheoNguoiDung = async (req, res) => {
     const id = req.nguoidung._id.toString();
-
     try {
         const dichvu = await Dichvu.find({ idNguoiDungDV: id });
-
         res.status(200).json(dichvu);
     } catch (error) {
         res.status(500).json({ error: "Internal server error" });
         console.error("Error in layDichVu controller", error);
     }
 };
+
+export const capNhatLuotXem = async (req, res) => {
+    const { id } = req.params; 
+    try {   
+        const dichVu = await Dichvu.findById(id);
+        if (dichVu) {
+            dichVu.luotXem += 1;
+            await dichVu.save();
+        } else {
+            console.log('Dịch vụ không tồn tại');
+        }
+    } catch (error) {
+        res.status(500).json({ error: "Lỗi 500" });
+        console.log("Lỗi idDichVu controller", error.message);
+    }
+}

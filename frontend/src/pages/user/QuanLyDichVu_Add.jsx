@@ -133,9 +133,9 @@ function QuanLyDichVu_Add() {
                         </label>
                         <input
                             type="text"
-                            value={formData.kyNang.join(', ')}
+                            value={formData.kyNang.join(';')}
                             onChange={(e) => {
-                                const newSkills = e.target.value.split(',').map((k) => k.trim());
+                                const newSkills = e.target.value.split(';').map((k) => k);
                                 setFormData((prevData) => ({
                                     ...prevData,
                                     kyNang: newSkills

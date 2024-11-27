@@ -1,26 +1,37 @@
-import { useNavigate, useParams } from 'react-router-dom';
-import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useState, useEffect  } from "react";
 import axios from 'axios';
 
 import Header from "../../components/user/Header";
 import CategoriesMenu from "../../components/user/CategoriesMenu";
+import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
+import { IoMdArrowUp  } from "react-icons/io";
+import { IoArrowDown } from "react-icons/io5";
 
 function CategoryDetail() {
-    const { id } = useParams(); 
+    const location = useLocation();
+    const { id } = location.state || {};
     const navigate = useNavigate();
     const [dichvu, setDichvu] = useState([]); 
-    const [users, setUsers] = useState({});
+    const [tong, setTong] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [sort, setSort] = useState('phobien');
+    const [page, setPage] = useState(1);
+    const [tongPages, setTongPages] = useState(1);
+
+    useEffect(() => {
+        setPage(1);
+    }, [location]);
 
     useEffect(() => {
         const fetchDanhmucData = async () => {
+            setLoading(true);
             try {
-                const response = await axios.get(`/api/dichvu/theodanhmuc/${id}`);
-                setDichvu(response.data);
-                response.data.forEach(dv => {
-                    fetchUserData(dv.idNguoiDungDV, dv._id);
-                });
+                const response = await axios.get(`/api/dichvu/theodanhmuc/${id}?sort=${sort}&page=${page}`);
+                setDichvu(response.data.dichvu);
+                setTong(response.data.tong);
+                setTongPages(response.data.tongPage);
             } catch (err) {
                 console.error(err);
                 setError("Lỗi tải dịch vụ");
@@ -30,16 +41,15 @@ function CategoryDetail() {
         };
 
         fetchDanhmucData();
-    }, [id]);
+    }, [id, sort, page]);
 
-    const fetchUserData = async (idND, dvId) => {
-        try {
-            const response = await axios.get(`/api/user/layTheoId/${idND}`);
-            setUsers(prevUsers => ({ ...prevUsers, [dvId]: response.data })); 
-        } catch (err) {
-            console.error(err);
-            setError("Failed to load user data.");
-        }
+    const handleSortChange = (newSort) => {
+        setSort(newSort);
+        setPage(1);
+    };
+
+    const handlePageChange = (newPage) => {
+        setPage(newPage);
     };
 
     if (loading) {
@@ -52,54 +62,130 @@ function CategoryDetail() {
 
     return (
         <div className="container mx-auto px-4">
-            {/* Header */}
             <div id="Header" className="mb-6">
                 <Header />
             </div>
             
-            {/* Categories Menu */}
             <div id="CategoriesMenu" className="mb-8">
-                <CategoriesMenu />
+                <CategoriesMenu setPage={setPage} />
             </div>
 
             <div className="content">
-                {dichvu.length === 0 ? (
-                    <div className="text-center text-gray-600 text-lg font-medium">
-                        Không có dịch vụ nào trong danh mục này.
+                <div className='flex justify-between bg-pink-50 py-2 px-3 mr-10 ml-10 mb-5 rounded-lg shadow '>
+                    <div className='flex items-center'>
+                        <p className='mr-3'>Sắp xếp theo</p>
+                        <button 
+                            onClick={() => handleSortChange('phobien')} 
+                            className={`px-3 py-1  mr-2 rounded-lg shadow hover:bg-pink-400 hover:text-white transition duration-200 ${sort === 'phobien' ? 'bg-pink-400 text-white' : 'bg-white '}`}>
+                            Phổ biến
+                        </button>
+                        <button 
+                            onClick={() => handleSortChange('moinhat')}  
+                            className={`px-3 py-1  mr-2 rounded-lg shadow hover:bg-pink-400 hover:text-white transition duration-200 ${sort === 'moinhat' ? 'bg-pink-400 text-white' : 'bg-white '}`}>
+                            Mới nhất
+                        </button>
+                        <button 
+                            onClick={() => handleSortChange('nhieunguoidat')}  
+                            className={`px-3 py-1  mr-2 rounded-lg shadow hover:bg-pink-400 hover:text-white transition duration-200 ${sort === 'nhieunguoidat' ? 'bg-pink-400 text-white' : 'bg-white'}`}>
+                            Nhiều người đặt
+                        </button>
+                        <button 
+                            onClick={() => handleSortChange('giatang')}  
+                            className={`flex items-center px-3 py-1 mr-2 rounded-lg shadow hover:bg-pink-400 hover:text-white transition duration-200 ${sort === 'giatang' ? 'bg-pink-400 text-white' : 'bg-white '}`}>
+                            Giá <IoMdArrowUp/>
+                        </button>
+                        <button 
+                            onClick={() => handleSortChange('giagiam')}  
+                            className={`flex items-center px-3 py-1 mr-2 rounded-lg shadow hover:bg-pink-400 hover:text-white transition duration-200 ${sort === 'giagiam' ? 'bg-pink-400 text-white' : 'bg-white '}`}>
+                            Giá <IoArrowDown/>
+                        </button>
                     </div>
-                ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        {dichvu.map((dv) => (
-                            <div
-                                key={dv._id}
-                                onClick={() => navigate(`/categories/dichvu/${dv._id}`)}
-                                className="bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden transition transform hover:scale-105 hover:shadow-xl"
-                            >
-                                <img
-                                    src={dv.anhDichVu || 'https://placehold.co/60x60/FF69B4/FFFFFF'}
-                                    alt={dv.tenDichVu || 'Dich vu image'}
-                                    className="w-full h-48 object-cover rounded-t-lg"
-                                />
-                                <div className="p-4">
-                                    <div className='flex mb-3'>
+                    <div className='flex items-center'>
+                        <p className='mr-3'>{page}/{tongPages}</p>
+                        <button 
+                            onClick={() => handlePageChange(page - 1)}
+                            disabled={page === 1}
+                            className='p-2 bg-white mr-2 rounded-lg shadow hover:bg-pink-400 hover:text-white transition duration-200'>
+                            <FaAngleLeft/>
+                        </button>
+                        <button
+                            onClick={() => handlePageChange(page + 1)}
+                            disabled={page === tongPages}
+                            className='p-2 bg-white rounded-lg shadow hover:bg-pink-400 hover:text-white transition duration-200'>
+                            <FaAngleRight/>
+                        </button>
+                    </div>
+                </div>
+                <p className='ml-10 text-base text-gray-500 mb-2'>{tong} Dịch vụ</p>
+                <div>
+                    {dichvu.length === 0 ? (
+                        <div className="text-center text-gray-600 text-lg font-medium">
+                            Không có dịch vụ nào trong danh mục này.
+                        </div>
+                    ) : (
+                        <>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 m-10 mt-0">
+                                {dichvu.map((dv) => (
+                                    <div
+                                        key={dv._id}
+                                        onClick={() => {
+                                            const urlTenND = dv?.idNguoiDungDV?.tenNguoiDung.replace(/\s+/g, '-');
+                                            const urlTenDV = dv?.tenDichVu.replace(/\s+/g, '-');
+                                            navigate(`/${urlTenND}/${urlTenDV}`, {
+                                                state: { id: dv?._id },
+                                            });
+                                        }}
+                                        className="bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden transition transform hover:scale-105 hover:shadow-xl"
+                                    >
                                         <img
-                                            alt="Profile picture" 
-                                            className="rounded-full w-6 h-6 mr-2" 
-                                            src={users[dv._id]?.anhND || "https://placehold.co/20x20/FF69B4/FFFFFF"}
+                                            src={dv.anhDichVu || 'https://placehold.co/60x60/FF69B4/FFFFFF'}
+                                            alt={dv.tenDichVu || 'Dich vu image'}
+                                            className="w-full h-48 object-cover rounded-t-lg"
                                         />
-                                        <h1 className='text-lg font-semibold'>{users[dv._id]?.tenNguoiDung || "Tên người dùng không có"}</h1>
-                                    </div>
-                                    <h2 className="text-lg text-gray-800 mb-2 capitalize">{dv.tenDichVu}</h2>
-                                    <div className="flex items-center justify-between">
-                                        <div className="text-xl font-bold text-green-600">
-                                            Từ {dv.phanLoai?.coban?.giaLoai?.toLocaleString() || 'N/A'} đ
+                                        <div className="p-4">
+                                            <div className='flex mb-3'>
+                                                <img
+                                                    alt="Profile picture" 
+                                                    className="rounded-full w-6 h-6 mr-2" 
+                                                    src={dv?.idNguoiDungDV?.anhND || "https://placehold.co/20x20/FF69B4/FFFFFF"}
+                                                />
+                                                <h1 className='text-lg font-semibold'>{dv?.idNguoiDungDV?.tenNguoiDung || "Tên người dùng không có"}</h1>
+                                            </div>
+                                            <h2 className="text-lg text-gray-800 mb-2 capitalize">{dv.tenDichVu}</h2>
+                                            <div className="flex items-center justify-between">
+                                                <div className="text-xl font-bold text-green-600">
+                                                    Từ {dv.phanLoai?.coban?.giaLoai?.toLocaleString() || 'N/A'} đ
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
-                )}
+                            <div className="flex justify-center items-center mt-6 mb-10">
+                                <button 
+                                    onClick={() => handlePageChange(page - 1)}
+                                    disabled={page === 1}
+                                    className={`px-4 py-2 mx-1 rounded-lg shadow hover:bg-pink-400 hover:text-white transition duration-200 ${page === 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-white'}`}>
+                                    <FaAngleLeft />
+                                </button>
+                                {Array.from({ length: tongPages }, (_, index) => (
+                                    <button
+                                        key={index + 1}
+                                        onClick={() => handlePageChange(index + 1)}
+                                        className={`px-4 py-2 mx-1 rounded-lg shadow hover:bg-pink-400 hover:text-white transition duration-200 ${page === index + 1 ? 'bg-pink-400 text-white' : 'bg-white'}`}>
+                                        {index + 1}
+                                    </button>
+                                ))}
+                                <button 
+                                    onClick={() => handlePageChange(page + 1)}
+                                    disabled={page === tongPages}
+                                    className={`px-4 py-2 mx-1 rounded-lg shadow hover:bg-pink-400 hover:text-white transition duration-200 ${page === tongPages ? 'bg-gray-300 cursor-not-allowed' : 'bg-white'}`}>
+                                    <FaAngleRight />
+                                </button>
+                            </div>
+                        </>
+                    )}
+                </div>
             </div>
         </div>
     );

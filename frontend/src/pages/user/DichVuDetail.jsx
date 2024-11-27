@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import Axios from 'axios';
 import CategoriesMenu from "../../components/user/CategoriesMenu";
 import Header from "../../components/user/Header";
 import GioHang from '../../components/user/GioHang';
 import { FaRegClock } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import { GoHome } from "react-icons/go";
 
 function DichVuDetail() {
-    const { id } = useParams();
+    const location = useLocation();
+    const { id } = location.state || {};
     const [dichvu, setDichvu] = useState(null);
     const [loading, setLoading] = useState(true);
     const [selectedPackage, setSelectedPackage] = useState('coban');
@@ -58,15 +61,26 @@ function DichVuDetail() {
         }
     };
     
+    useEffect(() => {
+        const updateLuotXem = async () => {
+            try {
+                await Axios.post(`/api/dichvu/capnhat/luotxem/${id}`);
+            } catch (error) {
+                console.error("Có lỗi khi cập nhật lượt xem:", error);
+            }
+        };
 
+        updateLuotXem();
+    }, [id]);
+    
     if (loading) {
         return <div className="text-center py-12">Loading...</div>;
-    }
+    };
 
     if (!dichvu) {
         return <div className="text-center py-12">Không tìm thấy dịch vụ.</div>;
-    }
-    
+    };
+
     return (
         <div className="containe min-h-screen">
             <div id="Header">
@@ -77,14 +91,29 @@ function DichVuDetail() {
             </div>
             <div className="container mx-auto p-4 flex justify-around">
                 <div className='w-full pt-10 pr-12 pl-9'>
-                    <nav className="text-sm text-gray-600 mb-4">
-                        <a className="hover:underline capitalize mr-1" href="#">
-                            {dichvu?.idDanhMucDV?.tenDM || 'Tên danh mục'}
-                        </a>
-                        / 
-                        <a className="hover:underline capitalize ml-1" href="#">
-                            {dichvu.tenDichVu}
-                        </a>
+                    <nav className="text-sm text-gray-600 mb-4 flex items-center space-x-2">
+                        <ul className="flex items-center space-x-2">
+                            <li>
+                                <Link to={'/'}>
+                                    <GoHome className="text-xl text-gray-800 hover:text-pink-600 transition duration-200" />
+                                </Link>
+                            </li>
+                            <li className="text-gray-400">/</li>
+                            <li>
+                                <Link 
+                                    to={{
+                                        pathname: `/categories/${dichvu?.idDanhMucDV?.tenDM.replace(/\s+/g, '-')}`,
+                                    }}
+                                    state={{ 
+                                        id: dichvu?.idDanhMucDV?._id,
+                                        tenDM: dichvu?.idDanhMucDV?.tenDM
+                                    }}
+                                    className="text-gray-800 hover:text-pink-600 transition duration-200"
+                                >
+                                    {dichvu?.idDanhMucDV?.tenDM}
+                                </Link>
+                            </li>
+                        </ul>
                     </nav>
                     <h1 className="text-4xl font-bold mb-2">
                         {dichvu.tenDichVu}

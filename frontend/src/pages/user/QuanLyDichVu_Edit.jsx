@@ -92,8 +92,6 @@ function QuanLyDichVu_Edit() {
         }
     };
 
-    
-
     return (
         <div className="container mx-auto p-6 bg-gradient-to-br min-h-screen">
             <div id="Header" className="mb-6">
@@ -130,13 +128,13 @@ function QuanLyDichVu_Edit() {
 
                     <div className="mt-6">
                         <label className="block text-lg font-medium text-gray-700 mb-2">
-                            Kỹ Năng (nhập các kỹ năng, cách nhau bằng dấu phẩy):
+                            Kỹ Năng (nhập các kỹ năng, cách nhau bằng dấu chấm phẩy):
                         </label>
                         <input
                             type="text"
-                            value={formData.kyNang.join(', ')}
+                            value={formData.kyNang.join(';')}
                             onChange={(e) => {
-                                const newSkills = e.target.value.split(',').map((k) => k.trim());
+                                const newSkills = e.target.value.split(';').map((k) => k);
                                 setFormData((prevData) => ({
                                     ...prevData,
                                     kyNang: newSkills
@@ -150,12 +148,12 @@ function QuanLyDichVu_Edit() {
                         <label className="block text-lg font-medium text-gray-700 mb-2">Danh Mục</label>
                         <select
                             name="idDanhMucDV"
-                            value={formData.idDanhMucDV}
+                            value={formData?.idDanhMucDV?.tenDM}
                             onChange={handleChange}
                             className="uppercase w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-1 focus:ring-pink-500"
                             required
                         >
-                            <option value="">Chọn danh mục</option>
+                            <option value="{formData?.idDanhMucDV?.tenDM}">{formData?.idDanhMucDV?.tenDM}</option>
                             {categories.map((category) => (
                                 <option key={category.id} value={category.id} className="uppercase">
                                     {category.name}

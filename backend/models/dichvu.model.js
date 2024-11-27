@@ -82,6 +82,10 @@ const dichvuSchema = new mongoose.Schema(
                 default: [],
             },
         ],
+        luotXem: {
+            type: Number,
+            default: 0,
+        },
     },
     { timestamps: true }
 );

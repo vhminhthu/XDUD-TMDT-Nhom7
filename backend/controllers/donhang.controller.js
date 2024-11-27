@@ -58,6 +58,9 @@ export const themDonHang = async (req, res) => {
         khachHang.idDonHangND.push(donHangMoi._id); 
         await khachHang.save();
 
+        dichVu.soLuongDonHang.push(donHangMoi._id); 
+        await dichVu.save();
+
         res.status(201).json({ donhangId: donHangMoi._id });
     } catch (error) {
         console.error("Lỗi khi tạo đơn hàng:", error.message);
@@ -127,7 +130,6 @@ export const layGiaoDich = async (req, res) => {
     } catch (error) {
         console.error("Lỗi khi lấy giao dịch của đơn hàng:", error.message);
 
-        // Send a detailed error response
         return res.status(500).json({
             success: false,
             message: "Có lỗi xảy ra khi lấy giao dịch.",
