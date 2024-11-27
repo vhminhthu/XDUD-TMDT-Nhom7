@@ -25,7 +25,7 @@ function CategoriesMenu() {
                     {categories.map((category) => (
                         <li key={category._id} className="list-none">
                             <NavLink
-                                to={`/categories/${category.tenDM.replace(/\s+/g, '-')}`}
+                                to={`/categories/${category.tenDM.replace(/\s+/g, '-')}?loc=phobien&trang=1`}
                                 state={{
                                     id: category._id,
                                     tenDM: category.tenDM,

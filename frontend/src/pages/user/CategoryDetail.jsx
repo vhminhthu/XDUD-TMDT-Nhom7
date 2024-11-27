@@ -1,7 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect  } from "react";
 import axios from 'axios';
-
 import Header from "../../components/user/Header";
 import CategoriesMenu from "../../components/user/CategoriesMenu";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
@@ -16,13 +15,11 @@ function CategoryDetail() {
     const [tong, setTong] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [sort, setSort] = useState('phobien');
-    const [page, setPage] = useState(1);
     const [tongPages, setTongPages] = useState(1);
 
-    useEffect(() => {
-        setPage(1);
-    }, [location]);
+    const query = new URLSearchParams(window.location.search); 
+    const page = parseInt(query.get('trang')) || 1;
+    const sort = query.get('loc') || 'phobien';
 
     useEffect(() => {
         const fetchDanhmucData = async () => {
@@ -44,14 +41,21 @@ function CategoryDetail() {
     }, [id, sort, page]);
 
     const handleSortChange = (newSort) => {
-        setSort(newSort);
-        setPage(1);
+        navigate(`?loc=${newSort}&trang=1`, {
+            state: {
+                id: id,
+            }
+        });
     };
-
+    
     const handlePageChange = (newPage) => {
-        setPage(newPage);
+        const pageNumber = parseInt(newPage);
+        navigate(`?loc=${sort}&trang=${pageNumber}`, {
+            state: {
+                id: id,
+            }
+        });
     };
-
     if (loading) {
         return <div>Loading...</div>; 
     }
@@ -67,7 +71,7 @@ function CategoryDetail() {
             </div>
             
             <div id="CategoriesMenu" className="mb-8">
-                <CategoriesMenu setPage={setPage} />
+                <CategoriesMenu />
             </div>
 
             <div className="content">
