@@ -16,6 +16,9 @@ function Header() {
     const queryClient = useQueryClient(); 
     const navigate = useNavigate(); 
 
+    const [timKiem, setTimKiem] = useState('');
+    const [dsGoiY, setdsGoiY] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const xulyThongBao = () => {
         setHienThiThongBao(prev => !prev);
@@ -84,6 +87,33 @@ function Header() {
         }
     };
 
+    const handleSearchChange = async (e) => {
+        const value = e.target.value;
+        setTimKiem(value);
+
+        if (value.trim() === '') {
+            setdsGoiY([]);
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const response = await axios.get(`/api/dichvu/search/goiy?search=${value}`);
+            setdsGoiY(response.data);
+        } catch (error) {
+            setError('Có lỗi khi tìm kiếm. Vui lòng thử lại.');
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter' && dsGoiY.length > 0) {
+            navigate(`/search/dichvu?search=${timKiem}&loc=phobien&trang=1`);
+        }
+    };
+
     if (error) return <div className="text-red-500 text-center mt-4">{error}</div>;
     if (!user) return <div className="flex justify-center items-center mt-4"><div className="loader">Đang tải...</div></div>;
 
@@ -91,12 +121,35 @@ function Header() {
         <div className="header-row-wrapper">
             <div className="flex items-center justify-between mx-auto px-4 py-2">
                 <Link to={'/'} className="md:text-2xl font-bold cursor-pointer text-pink-600">BOOKING.</Link>
-                <div className="flex items-center w-full max-w-md mx-4">
+                <div className="relative flex items-center w-full max-w-md mx-4">
                     <input
                         type="text"
+                        value={timKiem}
+                        onChange={handleSearchChange}
+                        onKeyPress={handleKeyPress}
                         placeholder="Tìm kiếm"
                         className="md:w-screen md:px-3 px-1 w-full md:py-2 py-1 border border-gray-300 rounded-md focus:outline-none"
                     />
+                    {loading && <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-sm">Đang tải...</div>}
+                    {error && <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-sm text-red-500">{error}</div>}
+                    {dsGoiY.length > 0 && (
+                        <div className="absolute left-0 top-9 right-0 mt-2 bg-white shadow-lg rounded-md z-10 max-h-60 overflow-y-auto">
+                            {dsGoiY.map((goiy) => (
+                                <div 
+                                key={goiy._id}
+                                onClick={() => {
+                                    const urlTenND = goiy?.idNguoiDungDV?.tenNguoiDung.replace(/\s+/g, '-');
+                                    const urlTenDV = goiy?.tenDichVu.replace(/\s+/g, '-');
+                                    navigate(`/${urlTenND}/${urlTenDV}`, {
+                                        state: { id: goiy?._id },
+                                    });
+                                }}
+                                className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                                    {goiy.tenDichVu}
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
                 <nav>
                     <ul className="flex md:space-x-6 items-center md:flex space-x-1">
