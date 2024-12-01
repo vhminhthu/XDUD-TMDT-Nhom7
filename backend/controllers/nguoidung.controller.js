@@ -148,4 +148,98 @@ export const layYeuThich = async (req, res) => {
     }
 };
 
+export const capNhatSoDu = async (req, res) => {
+    const { nguoiGiaoDich, soTienGiaoDich, dongTien, noiDungGiaoDich, idNguoiBan } = req.body;
+
+    try {
+        const nguoiDung = await Nguoidung.findById(idNguoiBan);
+
+        if (!nguoiDung) {
+            return res.status(404).json({ message: 'Người dùng không tồn tại' });
+        }
+
+        const soTienGiaoDichMoi = soTienGiaoDich * 90 / 100;
+
+        const giaoDichMoi = {
+            nguoiGiaoDich,
+            soTienGiaoDich: soTienGiaoDichMoi,
+            dongTien,
+            noiDungGiaoDich,
+            ngayGiaoDich: new Date(),
+        };
+
+        nguoiDung.soDu.push(giaoDichMoi);
+
+        await nguoiDung.save();
+
+        return res.status(200).json({ message: 'Cập nhật số dư thành công', soDu: nguoiDung.soDu });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Đã xảy ra lỗi trong quá trình cập nhật số dư' });
+    }
+};
+
+export const layGiaoDich = async (req, res) => {
+    const id = req.nguoidung._id;
+
+    try {
+        const nguoiDung = await Nguoidung.findById(id);
+
+        if (!nguoiDung) {
+            return res.status(404).json({ message: 'Người dùng không tồn tại' });
+        }
+
+        let tongTien = 0;
+
+        for (let giaoDich of nguoiDung.soDu) {
+            if (giaoDich.dongTien === 'Cộng') {
+                tongTien += giaoDich.soTienGiaoDich;
+            }
+            else if (giaoDich.dongTien === 'Trừ') {
+                tongTien -= giaoDich.soTienGiaoDich;
+            }
+        }
+
+        const danhSachGiaoDich = nguoiDung.soDu.sort((a, b) => new Date(b.ngayGiaoDich) - new Date(a.ngayGiaoDich));
+
+        return res.status(200).json({ message: 'Lấy giao dịch thành công', tongTien, danhSachGiaoDich });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Đã xảy ra lỗi khi lấy giao dịch' });
+    }
+};
+
+export const capNhatSoDuRutTien = async (req, res) => {
+    const id = req.nguoidung._id;
+    const { soTienGiaoDich, dongTien, noiDungGiaoDich } = req.body;
+
+    try {
+        const nguoiDung = await Nguoidung.findById(id);
+
+        if (!nguoiDung) {
+            return res.status(404).json({ message: 'Người dùng không tồn tại' });
+        }
+
+        const giaoDichMoi = {
+            nguoiGiaoDich: id,
+            soTienGiaoDich,
+            dongTien,
+            noiDungGiaoDich,
+            ngayGiaoDich: new Date(),
+        };
+
+        nguoiDung.soDu.push(giaoDichMoi);
+
+        await nguoiDung.save();
+
+        return res.status(200).json({ message: 'Cập nhật số dư thành công', soDu: nguoiDung.soDu });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Đã xảy ra lỗi trong quá trình cập nhật số dư' });
+    }
+};
+
+
+
 

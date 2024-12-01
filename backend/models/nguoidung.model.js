@@ -53,6 +53,31 @@ const nguoidungSchema = new mongoose.Schema(
 				default: [],
 			},
 		],
+		soDu: [
+            {
+                nguoiGiaoDich: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "Nguoidung",
+                    required: true,
+                },
+                soTienGiaoDich: {
+                    type: Number,
+                    required: true,
+                },
+				dongTien: {
+					type: String,
+					required: true,
+				},
+				noiDungGiaoDich: {
+                    type: String,
+                    required: true,
+                },
+                ngayGiaoDich: {
+                    type: Date,
+                    default: Date.now,
+                },
+            },
+        ],
     }
 )
 

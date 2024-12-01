@@ -26,7 +26,7 @@ function QuanLyDichVu_Edit() {
         const fetchServiceData = async () => {
             try {
                 const response1 = await axios.get(`/api/dichvu/lay/${id}`);
-                setFormData(response1.data);
+                setFormData(response1.data.dichvu);
                 const response2 = await axios.get('/api/danhmuc');
                 const categoryNames = response2.data.map(category => ({
                     id: category._id,

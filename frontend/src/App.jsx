@@ -21,6 +21,7 @@ import PaymentResult from './pages/user/PaymentResult';
 import QuanLyDonDatHang from './pages/user/QuanLyDonDatHang';
 import QuanLyDonHang from './pages/user/QuanLyDonHang';
 import TimKiemDichVu from './pages/user/TimKiemDichVu';
+import QuanLyGiaoDich from './pages/user/QuanLyGiaoDich';
 
 function App() {
   const { data: authUser, isLoading } = useQuery({
@@ -66,6 +67,8 @@ function App() {
       <Route path="/user/quanlydichvu/list/add" element={<QuanLyDichVu_Add/>} />
       <Route path="/user/quanlydondathang/list" element={<QuanLyDonDatHang/>} />
       <Route path="/user/quanlydonhang/list" element={<QuanLyDonHang/>} />
+      <Route path="/user/quanlygiaodich/list" element={<QuanLyGiaoDich/>} />
+
 
       <Route path="/payment-result" element={<PaymentResult />} />
 

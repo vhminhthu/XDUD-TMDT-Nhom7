@@ -44,6 +44,14 @@ function QuanLyDonHang() {
         setHienThiChiTiet(prev => !prev);
     };
 
+    const capNhatSoDu = async (giaoDich) => {
+        try {
+            await axios.patch('/api/user/capnhat/sodu', giaoDich);
+        } catch (error) {
+            console.error("Lỗi khi cập nhật số dư:", error);
+            return false;
+        }
+    };
 
     return (
         <div className="container mx-auto px-4">
@@ -92,7 +100,7 @@ function QuanLyDonHang() {
                                     {donhang.map((donhang, index) => (
                                         <tr key={donhang._id} className="donhang_button border-b border-gray-200 hover:bg-gray-100" onClick={() => xulyXemChiTiet(donhang)}>
                                             <td className="py-3 px-6 text-center">{index+1}</td>
-                                            <td className="py-3 px-6 text-center">{moment(donhang.createdAt).format('YYYY-MM-DD hh:mm')}</td>
+                                            <td className="py-3 px-6 text-center">{moment(donhang.updatedAt).format('YYYY-MM-DD hh:mm')}</td>
                                             <td className="py-3 px-6 text-center">{donhang.nguoiBanId?.tenNguoiDung}</td>
                                             <td className="py-3 px-6 text-left">{donhang.dichVuId?.tenDichVu}</td>
                                             <td className="py-3 px-6 text-center">{donhang.phanLoai?.tenLoai}</td>
@@ -106,9 +114,26 @@ function QuanLyDonHang() {
                                             {donhang.trangThaiDH === "Đã hoàn thành" && (
                                                 <button
                                                     className="text-xs bg-yellow-200 hover:bg-yellow-300 text-yellow-800 font-semibold py-1 px-3 rounded-lg shadow"
-                                                    onClick={(e) => {
+                                                    onClick={async (e) => {
                                                         e.stopPropagation();
-                                                        handleCapNhatTrangThaiChange(donhang._id, "Đã kết thúc");
+                                            
+                                                        try {
+                                                            await handleCapNhatTrangThaiChange(donhang._id, "Đã kết thúc");
+                                            
+                                                            const giaoDich = {
+                                                                nguoiGiaoDich: donhang.khachHangId,
+                                                                soTienGiaoDich: donhang.tongTien,
+                                                                dongTien: 'Cộng',
+                                                                noiDungGiaoDich: "Hoàn thành đơn hàng: " + donhang._id,
+                                                                idNguoiBan: donhang.nguoiBanId,
+                                                            };
+                                            
+                                                            await capNhatSoDu(giaoDich);
+                                                            alert("Đơn hàng đã được hoàn thành và số dư đã được cập nhật.");
+                                                        } catch (error) {
+                                                            console.error("Lỗi khi cập nhật trạng thái đơn hàng hoặc số dư:", error);
+                                                            alert("Đã xảy ra lỗi. Vui lòng thử lại.");
+                                                        }
                                                     }}
                                                 >
                                                     Đã nhận sản phẩm

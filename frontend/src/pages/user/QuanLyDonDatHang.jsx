@@ -93,7 +93,7 @@ function QuanLyDonDatHang() {
                                     {donhang.map((donhang, index) => (
                                         <tr key={donhang._id} className="donhang_button border-b border-gray-200 hover:bg-gray-100" onClick={() => xulyXemChiTiet(donhang)}>
                                             <td className="py-3 px-6 text-center">{index+1}</td>
-                                            <td className="py-3 px-6 text-center">{moment(donhang.createdAt).format('YYYY-MM-DD hh:mm')}</td>
+                                            <td className="py-3 px-6 text-center">{moment(donhang.updatedAt).format('YYYY-MM-DD hh:mm')}</td>
                                             <td className="py-3 px-6 text-center">{donhang.khachHangId?.tenNguoiDung}</td>
                                             <td className="py-3 px-6 text-left">{donhang.dichVuId?.tenDichVu}</td>
                                             <td className="py-3 px-6 text-center">{donhang.phanLoai?.tenLoai}</td>
