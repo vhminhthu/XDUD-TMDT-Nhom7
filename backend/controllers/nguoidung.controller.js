@@ -1,4 +1,5 @@
 import Nguoidung from "../models/nguoidung.model.js"
+import Dichvu from '../models/dichvu.model.js'
 import {v2 as cloudinary} from 'cloudinary'
 
 export const formDangKy = async (req, res) => {
@@ -82,3 +83,69 @@ export const capNhat = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+export const yeuThich = async (req, res) => {
+    try {   
+        const idDV = req.params.id; 
+        const idND = req.nguoidung._id;
+        const nguoiDung = await Nguoidung.findById(idND);
+        if (!nguoiDung) {
+            return res.status(404).json({ message: 'Người dùng không tồn tại' });
+        }
+
+        const index = nguoiDung.danhSachYeuThich.indexOf(idDV);
+        if (index === -1) {
+            nguoiDung.danhSachYeuThich.push(idDV);
+        } else {
+            nguoiDung.danhSachYeuThich.splice(index, 1);
+        }
+        await nguoiDung.save();
+
+        return res.status(200).json({
+            message: index === -1 ? "Đã thêm vào danh sách yêu thích" : "Đã xóa khỏi danh sách yêu thích",
+            danhSachYeuThich: nguoiDung.danhSachYeuThich,
+        });
+    } catch (error) {
+        res.status(500).json({ error: "Lỗi 500" });
+        console.log("Lỗi yêu thích controller", error.message);
+    }
+};
+
+export const layYeuThich = async (req, res) => {
+    try {   
+        const idND = req.nguoidung._id;
+        const { page = 1, limit = 4 } = req.query;
+        const pageSize = parseInt(limit);
+        const skip = (page - 1) * pageSize;
+
+        const nguoiDung = await Nguoidung.findById(idND)
+        .populate({
+            path: "danhSachYeuThich",
+            populate: {
+                path: "idNguoiDungDV",
+                select: "tenNguoiDung"
+            }
+        });
+
+        if (!nguoiDung) {
+            return res.status(404).json({ message: 'Người dùng không tồn tại' });
+        }
+
+        const danhSachYeuThich = nguoiDung.danhSachYeuThich;
+        const tong = danhSachYeuThich.length;
+        const tongPage = Math.ceil(tong / pageSize);
+
+        const danhSachYeuThichPaginized = danhSachYeuThich.slice(skip, skip + pageSize);
+
+        return res.status(200).json({
+            danhSachYeuThich: danhSachYeuThichPaginized,
+            tong,
+            tongPage
+        });
+    } catch (error) {
+        res.status(500).json({ error: "Lỗi 500" });
+        console.log("Lỗi yêu thích controller", error.message);
+    }
+};
+
+

@@ -164,7 +164,9 @@ function Header() {
                             </div>
                         </li>
                         <li>
-                            <Link to="/yeuthich" className="text-lg md:text-xl cursor-pointer hover:text-pink-600">
+                            <Link 
+                            to={`/user/${user.tenNguoiDung.replace(/\s+/g, '-')}/yeuthich?trang=1`}
+                            className="text-lg md:text-xl cursor-pointer hover:text-pink-600">
                                 <HiOutlineHeart />
                             </Link>
                         </li>

@@ -7,6 +7,10 @@ import GioHang from '../../components/user/GioHang';
 import { FaRegClock } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { GoHome } from "react-icons/go";
+import { IoIosHeartEmpty, IoIosHeart } from "react-icons/io";
+import { GoShareAndroid } from "react-icons/go";
+import { HiOutlineDotsHorizontal } from "react-icons/hi";
+
 
 function DichVuDetail() {
     const location = useLocation();
@@ -15,6 +19,8 @@ function DichVuDetail() {
     const [loading, setLoading] = useState(true);
     const [selectedPackage, setSelectedPackage] = useState('coban');
     const [hienthiGiohang, setHienthiGiohang] = useState(false);
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [favoriteCount, setFavoriteCount] = useState(0);
 
     const handleClickOutside = (event) => {
         if (!event.target.closest('.giohang_button') && !event.target.closest('#giohang')) {
@@ -36,7 +42,9 @@ function DichVuDetail() {
     const fetchProductDetails = async (id) => {
         try {
             const response = await Axios.get(`/api/dichvu/lay/${id}`);
-            setDichvu(response.data);
+            setDichvu(response.data.dichvu);
+            setIsFavorite(response.data.isFavorite);
+            setFavoriteCount(response.data.favoriteCount);
             setLoading(false);
         } catch (error) {
             console.error("Lỗi khi tải dịch vụ:", error);
@@ -72,6 +80,16 @@ function DichVuDetail() {
 
         updateLuotXem();
     }, [id]);
+
+    const toggleFavorite = async () => {
+        try {
+            const response = await Axios.post(`/api/user/capnhat/yeuthich/${id}`);
+            setIsFavorite(!isFavorite);
+            console.log(response.data.message);
+        } catch (error) {
+            console.error("Lỗi khi cập nhật yêu thích:", error.message);
+        }
+    };
     
     if (loading) {
         return <div className="text-center py-12">Loading...</div>;
@@ -165,8 +183,24 @@ function DichVuDetail() {
                 </div>
 
                 <div className="pt-10 pr-12">
-                    <div>
-
+                    <div className="w-auto flex items-center justify-end mb-3">
+                        <div
+                            onClick={toggleFavorite}
+                            className={`cursor-pointer ${
+                                isFavorite ? "text-red-500" : "text-gray-500"
+                            } transition duration-200`}
+                        >
+                            {isFavorite ? <IoIosHeart size={20} /> : <IoIosHeartEmpty size={20} />}
+                        </div>
+                        <div className='px-2 h-9 flex justify-center items-center text-lg border ml-2'>
+                            {favoriteCount}
+                        </div>
+                        <div className='px-2 h-9 flex justify-center items-center text-lg border ml-2'>
+                            <GoShareAndroid/>
+                        </div>
+                        <div className='px-2 h-9 flex justify-center items-center text-lg border ml-2'>
+                            <HiOutlineDotsHorizontal/>
+                        </div>
                     </div>
                     <div className="items-center border p-7 w-96">
                         <div>

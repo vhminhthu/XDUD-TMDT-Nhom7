@@ -50,7 +50,7 @@ function App() {
     <Routes>
       {/* trang chinh */}
       <Route path="/" element={authUser ? <Home /> : <Navigate to="/dangky" />} />
-      <Route path="/yeuthich" element={<YeuThich/>} />
+      <Route path="/user/:ten/yeuthich" element={<YeuThich/>} />
       <Route path="/freelancer/overview" element={<FreelancerOverview/>} />
       <Route path="/freelancer/info" element={<FreelancerInfo/>} />
 
