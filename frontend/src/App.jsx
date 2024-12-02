@@ -22,6 +22,7 @@ import QuanLyDonDatHang from './pages/user/QuanLyDonDatHang';
 import QuanLyDonHang from './pages/user/QuanLyDonHang';
 import TimKiemDichVu from './pages/user/TimKiemDichVu';
 import QuanLyGiaoDich from './pages/user/QuanLyGiaoDich';
+import { AuthProvider } from './store/AuthStore';
 
 function App() {
   const { data: authUser, isLoading } = useQuery({
@@ -48,6 +49,7 @@ function App() {
   }
 
   return (
+    <AuthProvider>
     <Routes>
       {/* trang chinh */}
       <Route path="/" element={authUser ? <Home /> : <Navigate to="/dangky" />} />
@@ -81,6 +83,7 @@ function App() {
       <Route path="/type" element={<Type/>} />
       <Route path="/adminprofile" element={<Profile/>} />
     </Routes>
+    </AuthProvider>
   )
 }
 
