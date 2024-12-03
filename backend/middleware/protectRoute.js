@@ -23,3 +23,11 @@ const token = req.cookies.jwt
         return res.status(500).json({error:" Lỗi 500" })
     }
 }
+
+export const isAdmin = async (req,res,next) => {
+    if (req.nguoidung && req.nguoidung.vaiTro === "admin") {
+        next();
+    } else {
+        return res.status(403).json({error: "Error: Admins only" })
+    }
+}

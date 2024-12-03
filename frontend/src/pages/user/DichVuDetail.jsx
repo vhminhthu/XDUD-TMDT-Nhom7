@@ -11,7 +11,9 @@ import { IoIosHeartEmpty, IoIosHeart } from "react-icons/io";
 import { GoShareAndroid } from "react-icons/go";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+import { useAuth } from '../../store/AuthStore';
 import moment from 'moment';
+import ChatBubble from './ChatBubble';
 
 
 function DichVuDetail() {
@@ -29,6 +31,8 @@ function DichVuDetail() {
     const [dsDanhGia, setdsDanhGia] = useState([]);
     const [dsDanhGiaLoc, setdsDanhGiaLoc] = useState([]);
     const [soSaoDaChon, setSoSaoDaChon] = useState(0);
+    const { authUser } = useAuth();
+    
 
     const handleClickOutside = (event) => {
         if (!event.target.closest('.giohang_button') && !event.target.closest('#giohang')) {
@@ -46,6 +50,8 @@ function DichVuDetail() {
     const handlePackageChange = (packageType) => {
         setSelectedPackage(packageType);
     };
+
+      
 
     const fetchProductDetails = async (id) => {
         try {
@@ -77,8 +83,12 @@ function DichVuDetail() {
             setHienthiGiohang(prev => !prev);
         } catch (error) {
             console.error("Lỗi khi thêm vào giỏ hàng:", error);
+            if (error.response && error.response.status === 403) {
+                alert("Bạn không có quyền thực hiện này");
+            }
         }
     };
+    
     
     useEffect(() => {
         const updateLuotXem = async () => {
@@ -138,6 +148,8 @@ function DichVuDetail() {
     if (!dichvu) {
         return <div className="text-center py-12">Không tìm thấy dịch vụ.</div>;
     };
+
+    
 
     return (
         <div className="containe min-h-screen">
@@ -395,6 +407,8 @@ function DichVuDetail() {
                         <i className="fas fa-chevron-down">
                         </i>
                     </button>
+                    
+                    {authUser !== dichvu.idNguoiDungDV && <ChatBubble id={id} />}
                 </div>
             </div>
             {hienthiGiohang && (

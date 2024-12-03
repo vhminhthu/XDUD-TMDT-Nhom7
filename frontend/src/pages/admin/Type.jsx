@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import AdminNav from '../../components/AdminNav';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 export const Type = () => {
@@ -97,41 +96,6 @@ export const Type = () => {
         <div className="ml-24 flex-1 flex flex-col gap-5">
           <div className="flex justify-between items-center p-6 bg-neutral-100 shadow-md">
             <h1 className="text-lg font-bold text-gray-900">Danh mục</h1>
-            <div className="flex items-center bg-white rounded-full shadow-md w-full max-w-2xl relative">
-              <input
-                type="text"
-                placeholder="Nhập từ cần tìm.."
-                className="px-7 py-3 w-full rounded-3xl focus:outline-none pl-10"
-              />
-              <button className="absolute right-0 top-1/2 transform -translate-y-1/2 flex items-center justify-center bg-green-200 text-black font-bold rounded-full px-4 py-2 mr-2">
-                <svg
-                  className="w-5 h-5 mr-2 text-black"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  ></path>
-                </svg>
-                Tìm kiếm
-              </button>
-            </div>
-            <div className="flex items-center">
-              <button>
-                <Link to="/adminprofile">
-                  <img src="https://via.placeholder.com/40" alt="profile" className="w-10 h-10 rounded-full mr-2" />
-                </Link>
-              </button>
-              <div>
-                <p className="text-gray-800 font-semibold">Pham Tien</p>
-                <p className="text-gray-500 text-sm">Admin</p>
-              </div>
-            </div>
           </div>
 
           <div className="flex gap-16">
@@ -221,13 +185,13 @@ export const Type = () => {
                   value={newType}
                   onChange={(e) => setNewType(e.target.value)}
                   placeholder="Nhập tên danh mục"
-                  className="border rounded w-full p-2 mb-4"
+                  className="border focus:outline-none rounded w-full p-2 mb-4"
                 />
                 <div className="flex justify-end">
                   <button className="bg-gray-300  text-white px-4 py-2 rounded" onClick={handleCloseDialog}>
                     Đóng
                   </button>
-                  <button className="bg-blue-500  text-white px-4 py-2 rounded ml-2" onClick={handleSaveType}>
+                  <button className="bg-slate-500 text-white px-4 py-2 rounded ml-2" onClick={handleSaveType}>
                     Lưu
                   </button>
                 </div>

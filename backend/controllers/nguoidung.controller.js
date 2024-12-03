@@ -240,5 +240,110 @@ export const capNhatSoDuRutTien = async (req, res) => {
 };
 
 
+export const layHet = async (req, res) => {
+    try {
+        
+        const nguoiDungList = await Nguoidung.find(); 
+
+        
+        if (!nguoiDungList || nguoiDungList.length === 0) {
+            return res.status(404).json({ error: "Không có người dùng nào." });
+        }
+
+        
+        return res.status(200).json(nguoiDungList);
+    } catch (error) {
+        console.log("Lỗi layHet controller:", error.message);
+        res.status(500).json({ error: "Lỗi khi lấy danh sách người dùng." });
+    }
+};
 
 
+
+export const layTheoRole = async (req, res) => {
+    try {
+        const { role } = req.query; 
+
+        if (!role) {
+            return res.status(400).json({ error: "Vai trò không được cung cấp." });
+        }
+
+      
+        const nguoiDungList = await Nguoidung.find({ vaiTro: role });
+
+        if (!nguoiDungList || nguoiDungList.length === 0) {
+            return res.status(404).json({ error: `Không có người dùng với vai trò ${role}.` });
+        }
+
+        return res.status(200).json(nguoiDungList);
+    } catch (error) {
+        console.log("Lỗi layTheoRole controller:", error.message);
+        res.status(500).json({ error: "Lỗi khi lấy danh sách người dùng theo vai trò." });
+    }
+};
+
+
+
+export const voHieuHoa = async (req, res) => {
+    try {
+        const { id } = req.params; 
+
+
+        const nguoidung = await Nguoidung.findById(id);
+
+ 
+        if (!nguoidung) {
+            return res.status(404).json({ error: "Không tìm thấy người dùng." });
+        }
+
+   
+        nguoidung.vaiTro = 'blocked';
+
+   
+        await nguoidung.save();
+
+        return res.status(200).json({
+            message: "Người dùng đã bị khóa.",
+            nguoidung: {
+                tenNguoiDung: nguoidung.tenNguoiDung,
+                email: nguoidung.email,
+                vaiTro: nguoidung.vaiTro, 
+            },
+        });
+    } catch (error) {
+        console.log("Lỗi voHieuHoa controller:", error.message);
+        res.status(500).json({ error: "Lỗi khi vô hiệu hóa người dùng." });
+    }
+};
+
+export const traLaiQuyen = async (req, res) => {
+    const { id } = req.params;  
+
+    try {
+       
+        const nguoidung = await Nguoidung.findById(id);
+
+      
+        if (!nguoidung) {
+            return res.status(404).json({ error: "Không tìm thấy người dùng." });
+        }
+
+   
+        const isFreelancer = nguoidung.idDichVuND && nguoidung.idDichVuND.length > 0;
+
+  
+        nguoidung.vaiTro = isFreelancer ? 'freelancer' : 'user';
+
+      
+        await nguoidung.save();
+
+        return res.status(200).json({
+            message: "Quyền của người dùng đã được khôi phục.",
+            user: nguoidung
+        });
+
+    } catch (error) {
+        console.log("Lỗi traLaiQuyen controller:", error.message);
+        res.status(500).json({ error: "Lỗi khi trả lại quyền người dùng." });
+    }
+};

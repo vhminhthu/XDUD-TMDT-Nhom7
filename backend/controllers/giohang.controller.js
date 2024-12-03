@@ -1,4 +1,5 @@
 import Giohang from "../models/giohang.model.js"
+import Nguoidung from "../models/nguoidung.model.js";
 
 export const layGioHang = async (req, res) => {
     const idNguoiDung =  req.nguoidung._id.toString();
@@ -18,6 +19,11 @@ export const themDichVuVaoGioHang = async (req, res) => {
 
         if (!dichVuId || !soLuong || !phanLoai) {
             return res.status(400).json({ message: "Cần cung cấp ID dịch vụ, phân loại và số lượng" });
+        }
+
+        const nguoiDung = await Nguoidung.findById(id);
+        if (nguoiDung && nguoiDung.vaiTro === 'blocked') {
+            return res.status(403).json({ message: "Tài khoản của bạn đã bị khóa, không thể thêm dịch vụ vào giỏ hàng." });
         }
 
         let giohang = await Giohang.findOne({ _id: id });
@@ -44,16 +50,16 @@ export const themDichVuVaoGioHang = async (req, res) => {
             giohang.dichVu.phanLoai.moTaLoai === phanLoai.moTaLoai &&
             giohang.dichVu.phanLoai.thoiGianDuKien === phanLoai.thoiGianDuKien;
 
-        if (!kiemtra) {
-            giohang.dichVu.dichVuId = dichVuId;
-            giohang.dichVu.phanLoai = {
-                tenLoai: phanLoai.tenLoai,
-                giaLoai: phanLoai.giaLoai,
-                moTaLoai: phanLoai.moTaLoai,
-                thoiGianDuKien: phanLoai.thoiGianDuKien
-            };
-            giohang.dichVu.soLuong = soLuong;
-        }
+            if (!kiemtra) {
+                giohang.dichVu.dichVuId = dichVuId;
+                giohang.dichVu.phanLoai = {
+                    tenLoai: phanLoai.tenLoai,
+                    giaLoai: phanLoai.giaLoai,
+                    moTaLoai: phanLoai.moTaLoai,
+                    thoiGianDuKien: phanLoai.thoiGianDuKien
+                };
+                giohang.dichVu.soLuong = soLuong;
+            }
         }
 
         await giohang.save();

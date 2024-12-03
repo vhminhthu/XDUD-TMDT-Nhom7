@@ -22,6 +22,7 @@ import QuanLyDonDatHang from './pages/user/QuanLyDonDatHang';
 import QuanLyDonHang from './pages/user/QuanLyDonHang';
 import TimKiemDichVu from './pages/user/TimKiemDichVu';
 import QuanLyGiaoDich from './pages/user/QuanLyGiaoDich';
+import Chat from './pages/user/Chat';
 import { AuthProvider } from './store/AuthStore';
 
 function App() {
@@ -52,7 +53,7 @@ function App() {
     <AuthProvider>
     <Routes>
       {/* trang chinh */}
-      <Route path="/" element={authUser ? <Home /> : <Navigate to="/dangky" />} />
+      <Route path="/" element={authUser ? (authUser.vaiTro === 'admin' ? <Admin /> : <Home />) : <Navigate to="/dangky" />} />
       <Route path="/user/:ten/yeuthich" element={<YeuThich/>} />
       <Route path="/freelancer/overview" element={<FreelancerOverview/>} />
       <Route path="/freelancer/info" element={<FreelancerInfo/>} />
@@ -70,6 +71,7 @@ function App() {
       <Route path="/user/quanlydondathang/list" element={<QuanLyDonDatHang/>} />
       <Route path="/user/quanlydonhang/list" element={<QuanLyDonHang/>} />
       <Route path="/user/quanlygiaodich/list" element={<QuanLyGiaoDich/>} />
+      <Route path="/chat" element={<Chat />} />
 
 
       <Route path="/payment-result" element={<PaymentResult />} />
@@ -79,9 +81,9 @@ function App() {
       <Route path="/dangnhap"  element={!authUser ? <Dangnhap /> : <Navigate to="/" />} />
 
       {/* trang admin */}
-      <Route path="/admin" element={<Admin/>} />
-      <Route path="/type" element={<Type/>} />
-      <Route path="/adminprofile" element={<Profile/>} />
+      <Route path="/admin" element={authUser?.vaiTro === 'admin' ? <Admin /> : <Navigate to="/" />} />
+      <Route path="/type" element={authUser?.vaiTro === 'admin' ? <Type /> : <Navigate to="/" />} />
+      <Route path="/adminprofile" element={authUser?.vaiTro === 'admin' ? <Profile /> : <Navigate to="/" />} />
     </Routes>
     </AuthProvider>
   )

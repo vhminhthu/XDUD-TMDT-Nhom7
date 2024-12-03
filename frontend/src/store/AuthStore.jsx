@@ -8,8 +8,13 @@ export const useAuth = () => {
   return useContext(AuthContext);
 };
 
+export const useAuth2 = () => {
+  return useContext(AuthContext);
+};
+
 export const AuthProvider = ({ children }) => {
   const [authUser, setAuthUser] = useState(null);
+  const [authUser2, setAuthUser2] = useState(null);
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -17,6 +22,7 @@ export const AuthProvider = ({ children }) => {
       try {
         const response = await Axios.get('/api/auth/getme'); 
         setAuthUser(response.data._id); 
+        setAuthUser2(response.data.tenNguoiDung)
       } catch (error) {
         console.error('Lỗi khi lấy thông tin người dùng:', error);
       } finally {
@@ -32,7 +38,7 @@ export const AuthProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ authUser, setAuthUser }}>
+    <AuthContext.Provider value={{ authUser, setAuthUser, authUser2,setAuthUser2 }}>
       {children}
     </AuthContext.Provider>
   );

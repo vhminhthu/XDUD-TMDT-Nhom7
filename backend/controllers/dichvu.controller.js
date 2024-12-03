@@ -519,3 +519,36 @@ export const layDichVuTrangChu = async (req, res) => {
 };
 
 
+export const layNguoiTaoDichVu = async (req, res) => {
+    const { idDichVu } = req.params;
+  
+    try {
+
+      const dichVu = await Dichvu.findById(idDichVu);
+  
+      if (!dichVu) {
+        return res.status(404).json({ error: "Dịch vụ không tồn tại" });
+      }
+  
+   
+      const idNguoiTao = dichVu.idNguoiDungDV;
+  
+
+      const nguoiTao = await Nguoidung.findById(idNguoiTao).select("tenNguoiDung anhND");
+  
+      if (!nguoiTao) {
+        return res.status(404).json({ error: "Người tạo không tồn tại" });
+      }
+  
+ 
+      res.status(200).json({ 
+        idNguoiTao, 
+        tenNguoiDung: nguoiTao.tenNguoiDung,
+        anhND: nguoiTao.anhND 
+      });
+    } catch (error) {
+      console.error("Lỗi khi lấy người tạo dịch vụ:", error);
+      res.status(500).json({ error: "Lỗi máy chủ" });
+    }
+  };
+  

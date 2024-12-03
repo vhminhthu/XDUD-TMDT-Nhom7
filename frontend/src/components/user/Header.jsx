@@ -5,6 +5,8 @@ import axios from 'axios';
 import { useQueryClient } from '@tanstack/react-query'; 
 import { useNavigate } from 'react-router-dom';
 import HeaderDonHang from "./HeaderDonHang";
+import { useAuth } from "../../store/AuthStore";
+import { io } from "socket.io-client"; 
 
 function Header() {
     const [hienthiThongBao, setHienThiThongBao] = useState(false);
@@ -12,9 +14,12 @@ function Header() {
     const [hienthiDonHang, setHienThiDonHang] = useState(false);
     const [hienthiNguoiDung, setHienThiNguoiDung] = useState(false);
     const [user, setUser] = useState(null);
+    const [isUnread, setIsUnread] = useState(false);
     const [error, setError] = useState(null);
     const queryClient = useQueryClient(); 
     const navigate = useNavigate(); 
+    const [thongbao, setThongBao] = useState([]);
+    const { authUser } = useAuth();
 
     const [timKiem, setTimKiem] = useState('');
     const [dsGoiY, setdsGoiY] = useState([]);
@@ -22,6 +27,9 @@ function Header() {
 
     const xulyThongBao = () => {
         setHienThiThongBao(prev => !prev);
+        if (!hienthiThongBao) {
+            setIsUnread(false);
+        }
     };
 
     const xulyTinNhan = () => {
@@ -114,6 +122,47 @@ function Header() {
         }
     };
 
+    useEffect(() => {
+        const fetchThongBao = async () => {
+            try {
+                const response = await axios.get('/api/thongbao/');
+                setThongBao(response.data);
+            } catch (err) {
+                console.error('Lỗi lấy thông báo:', err.message);
+            }
+        };
+    
+        fetchThongBao();
+    }, []);
+
+    const handleXoaThongBao = async (id) => {
+        try {
+            await axios.delete(`/api/thongbao/xoa/${id}`); 
+            setThongBao(thongbao.filter(tb => tb._id !== id)); 
+        } catch (err) {
+            console.error('Lỗi xóa thông báo:', err.message);
+        }
+    };
+
+    useEffect(() => {
+        if (authUser) {
+            const socket = io("http://localhost:5000", {
+                query: { idNguoidung: authUser } 
+            });
+    
+
+            socket.on("thongBaoMoi", (data) => {
+                console.log("Có thông báo mới:", data);
+                setThongBao((prevThongbao) => [data, ...prevThongbao]);
+                setIsUnread(true);
+            });
+    
+            return () => {
+                socket.disconnect();
+            };
+        }
+    }, [authUser]); 
+
     if (error) return <div className="text-red-500 text-center mt-4">{error}</div>;
     if (!user) return <div className="flex justify-center items-center mt-4"><div className="loader">Đang tải...</div></div>;
 
@@ -154,8 +203,14 @@ function Header() {
                 <nav>
                     <ul className="flex md:space-x-6 items-center md:flex space-x-1">
                         <li>
-                            <div className="thongbao_button text-lg md:text-xl cursor-pointer hover:text-pink-600" onClick={xulyThongBao}>
+                        <div
+                                className="relative thongbao_button text-lg md:text-xl cursor-pointer hover:text-pink-600"
+                                onClick={xulyThongBao}
+                            >
                                 <HiOutlineBell />
+                                {isUnread && (
+                                    <span className="absolute top-0 right-0 bg-red-500 w-2.5 h-2.5 rounded-full"></span>
+                                )}
                             </div>
                         </li>
                         <li>                                   
@@ -197,19 +252,50 @@ function Header() {
             </div>
 
             <div>
-                {hienthiThongBao && (
-                    <div id="Thongbao" className="absolute right-5 w-64 bg-white border rounded shadow-lg z-50">
-                        <div className="border-b px-4 py-2">
-                            <h2 className="text-lg font-semibold">Thông báo (1)</h2>
-                        </div>
-                        <div className="p-4 flex items-start space-x-4">
-                            <div className="flex-1">
-                                <p className="text-sm text-gray-700">Thông báo 1</p>
-                                <p className="text-xs text-gray-500 mt-1">3 ngày trước</p>
-                            </div>
-                        </div>
+            {hienthiThongBao && (
+            <div id="Thongbao" className="absolute right-5 w-64 bg-white border rounded shadow-lg z-50">
+                <div className="border-b px-4 py-2">
+                    <h2 className="text-lg font-semibold">Thông báo ({thongbao.length})</h2>
+                </div>
+                {thongbao.length > 0 ? (
+                    <div className="p-4 space-y-2">
+                        {thongbao.map((tb) => {
+                             
+                            return (
+                                <div 
+                                key={tb._id} 
+                                className="flex items-start space-x-2 border-b border-gray-300 pb-2 last:border-none"
+                                onClick={() => navigate('/chat')} 
+                            >
+                                    <div className="flex-1">
+                                        <p className="text-sm text-gray-700">
+                                            <span className="font-bold">{tb.noiDungTB}</span>
+                                        </p>
+                                        <p className="text-xs text-gray-500 mt-1">
+                                           
+                                        </p>
+                                    </div>
+                                    <button 
+                                        className="text-gray-500" 
+                                        onClick={(e) => {
+                                            e.stopPropagation(); 
+                                            handleXoaThongBao(tb._id); 
+                                        }}
+                                    >
+                                        x
+                                    </button>
+                                </div>
+                            );
+                              
+                        })}
+                    </div>
+                ) : (
+                    <div className="p-4">
+                        <p className="text-sm text-gray-500 text-center">Không có thông báo nào</p>
                     </div>
                 )}
+            </div>
+        )}
 
                 {hienthiTinNhan && (
                     <div id="Tinnhan" className="absolute right-5 w-64 bg-white border rounded shadow-lg z-50">
