@@ -496,3 +496,26 @@ export const layDanhGia = async (req, res) => {
     }
 };
 
+export const layDichVuTrangChu = async (req, res) => {
+    try {
+        const dichvu = await Dichvu.find().populate("idNguoiDungDV");
+
+        if (!dichvu || dichvu.length === 0) {
+            return res.status(404).json({ message: 'Không có dịch vụ nào' });
+        }
+
+        const dichVuPhoBien = dichvu
+            .sort((a, b) => b.luotXem - a.luotXem)
+            .slice(0, 4);
+
+
+        return res.status(200).json({
+            dichVuPhoBien,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Đã xảy ra lỗi khi lấy dữ liệu dịch vụ' });
+    }
+};
+
+

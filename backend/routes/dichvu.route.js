@@ -1,5 +1,5 @@
 import express from "express"
-import {layDichVu,themDichVu, suaDichVu, xoaDichVu, idDichvu, DichvutheoDM, layTheoNguoiDung, capNhatLuotXem, goiYTimKiem, timKiem, capNhatDanhGia, layDanhGia} from '../controllers/dichvu.controller.js'
+import {layDichVu,themDichVu, suaDichVu, xoaDichVu, idDichvu, DichvutheoDM, layTheoNguoiDung, capNhatLuotXem, goiYTimKiem, timKiem, capNhatDanhGia, layDanhGia, layDichVuTrangChu} from '../controllers/dichvu.controller.js'
 import { protectRoute } from "../middleware/protectRoute.js"
 
 const router = express.Router()
@@ -19,4 +19,5 @@ router.get("/search/timkiem",timKiem)
 router.patch("/capnhat/danhgia/:id",protectRoute,capNhatDanhGia)
 router.get("/lay/danhgia/:id",layDanhGia)
 
+router.get("/lay/dichvu/trangchu",layDichVuTrangChu)
 export default router

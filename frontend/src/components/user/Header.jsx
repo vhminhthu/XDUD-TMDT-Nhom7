@@ -120,7 +120,7 @@ function Header() {
     return (
         <div className="header-row-wrapper">
             <div className="flex items-center justify-between mx-auto px-4 py-2">
-                <Link to={'/'} className="md:text-2xl font-bold cursor-pointer text-pink-600">BOOKING.</Link>
+                <Link to={'/'} className="md:text-2xl font-bold cursor-pointer text-pink-600">CHEO.</Link>
                 <div className="relative flex items-center w-full max-w-md mx-4">
                     <input
                         type="text"
