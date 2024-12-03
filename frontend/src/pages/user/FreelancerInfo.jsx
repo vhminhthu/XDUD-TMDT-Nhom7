@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Header from "../../components/user/Header";
 import CategoriesMenu from "../../components/user/CategoriesMenu";
-import axios from "axios"; // Giả sử bạn sẽ sử dụng axios để gửi dữ liệu lên server
+import axios from "axios";
 
 function FreelancerInfo() {
     const [diaChi, setDiaChi] = useState("");
@@ -11,14 +11,11 @@ function FreelancerInfo() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // Kiểm tra dữ liệu đầu vào
         if (!diaChi || !soDienThoai) {
             setError("Vui lòng điền đầy đủ thông tin.");
             return;
         }
 
-        // Kiểm tra định dạng số điện thoại (ví dụ: bắt buộc có 10 chữ số)
         const phoneRegex = /^[0-9]{10}$/;
         if (!phoneRegex.test(soDienThoai)) {
             setError("Số điện thoại không hợp lệ.");
@@ -26,11 +23,10 @@ function FreelancerInfo() {
         }
 
         try {
-            // Gửi thông tin lên server (giả sử API /api/user/form)
             await axios.post("/api/user/form", { soDienThoai, diaChi });
 
             setSuccess("Thông tin đã được lưu thành công!");
-            setError(""); // Reset lỗi nếu thành công
+            setError("");
         } catch (err) {
             setError("Đã xảy ra lỗi. Vui lòng thử lại.");
             console.error(err);

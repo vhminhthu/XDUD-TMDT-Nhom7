@@ -13,7 +13,6 @@ export const formDangKy = async (req, res) => {
             return res.status(404).json({ error: "Người dùng không tồn tại" });
         }
 
-        // Kiểm tra vai trò của người dùng
         if (nguoidung.vaiTro === "freelancer") {
             return res.status(400).json({ message: "Bạn đã đăng ký là freelancer rồi." });
         }
@@ -123,7 +122,7 @@ export const layYeuThich = async (req, res) => {
             path: "danhSachYeuThich",
             populate: {
                 path: "idNguoiDungDV",
-                select: "tenNguoiDung"
+                select: "tenNguoiDung anhND"
             }
         });
 

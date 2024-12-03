@@ -29,6 +29,10 @@ const donhangSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "Nguoidung",
         },
+        danhGia: { 
+            type: Boolean, 
+            default: false,
+        },
         giaoDich: {
             maGiaoDich: { type: Number },
             trangThaiThanhToan: { type: String },

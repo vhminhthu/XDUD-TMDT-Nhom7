@@ -10,6 +10,8 @@ import { GoHome } from "react-icons/go";
 import { IoIosHeartEmpty, IoIosHeart } from "react-icons/io";
 import { GoShareAndroid } from "react-icons/go";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
+import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+import moment from 'moment';
 
 
 function DichVuDetail() {
@@ -21,6 +23,12 @@ function DichVuDetail() {
     const [hienthiGiohang, setHienthiGiohang] = useState(false);
     const [isFavorite, setIsFavorite] = useState(false);
     const [favoriteCount, setFavoriteCount] = useState(0);
+    const [soLuongDanhGia, setSoLuongDanhGia] = useState(0);
+    const [trungBinhSao, setTrungBinhSao] = useState(0);
+    const [soLuongDanhGiaTungSao, setSoLuongDanhGiaTungSao] = useState([]);
+    const [dsDanhGia, setdsDanhGia] = useState([]);
+    const [dsDanhGiaLoc, setdsDanhGiaLoc] = useState([]);
+    const [soSaoDaChon, setSoSaoDaChon] = useState(0);
 
     const handleClickOutside = (event) => {
         if (!event.target.closest('.giohang_button') && !event.target.closest('#giohang')) {
@@ -45,6 +53,9 @@ function DichVuDetail() {
             setDichvu(response.data.dichvu);
             setIsFavorite(response.data.isFavorite);
             setFavoriteCount(response.data.favoriteCount);
+            setSoLuongDanhGia(response.data.soLuongDanhGia);
+            setTrungBinhSao(response.data.trungBinhSao);
+            setSoLuongDanhGiaTungSao(response.data.saoCount);
             setLoading(false);
         } catch (error) {
             console.error("Lỗi khi tải dịch vụ:", error);
@@ -89,6 +100,35 @@ function DichVuDetail() {
         } catch (error) {
             console.error("Lỗi khi cập nhật yêu thích:", error.message);
         }
+    };
+
+    useEffect(() => {
+        const layDanhGia = async () => {
+            try {
+                const response = await Axios.get(`/api/dichvu/lay/danhgia/${id}`);
+                setdsDanhGia(response.data.danhSachDanhGia);
+            } catch (error) {
+                console.error("Có lỗi khi cập nhật lượt xem:", error);
+            }
+        };
+        layDanhGia();
+    }, [id]);
+
+    useEffect(() => {
+        setdsDanhGiaLoc(dsDanhGia);
+    }, [dsDanhGia]);
+
+    const locDanhGia = (soSao) => {
+        setSoSaoDaChon(soSao);
+        setdsDanhGiaLoc(dsDanhGia);
+        if (soSao === 0){
+            setdsDanhGiaLoc(dsDanhGia);
+        } else {
+            let filteredDanhGia = dsDanhGia.filter(danhGia => danhGia.soSao  === Number(soSao));
+            console.log("Danh sách sau khi lọc:", filteredDanhGia);
+            setdsDanhGiaLoc(filteredDanhGia);
+        }
+        console.log("số Sao:", soSao);
     };
     
     if (loading) {
@@ -147,13 +187,12 @@ function DichVuDetail() {
                                 {dichvu?.idNguoiDungDV?.tenNguoiDung || 'Tên người dùng'}
                             </h3>
                             <div className="flex items-center mb-2">
-                                <span className="text-yellow-500">
-                                    <i className="fas fa-star">
-                                    </i>
-                                    5.0
+                                <span className={`flex items-center h-8 ${trungBinhSao === 0 ? 'text-gray-500' : 'font-bold text-yellow-500'}`}>
+                                    {trungBinhSao === 0 ? 'Chưa có đánh giá' : trungBinhSao}
                                 </span>
-                                <span className="ml-2 text-gray-600">
-                                    (95)
+                                <FaStar size={15} className={`flex items-center h-8 ml-1 ${trungBinhSao === 0 ? 'text-gray-500' : 'text-yellow-500'}`} />
+                                <span className="flex items-center h-8 ml-2 text-gray-600">
+                                    ({soLuongDanhGia})
                                 </span>
                             </div>
                             <div>
@@ -174,11 +213,118 @@ function DichVuDetail() {
                     </div>
                     <div className='mt-5'>
                         <h2 className="text-xl font-bold">
-                            Mô tả về dịch vụ
+                            MÔ TẢ DỊCH VỤ
                         </h2>
                         <p className="mt-4 text-gray-800">
                             {dichvu.moTaDV}
                         </p>
+                    </div>
+                    <div className='mt-5'>
+                        <h2 className="text-xl font-bold">
+                            ĐÁNH GIÁ DỊCH VỤ
+                        </h2>
+                        {soLuongDanhGia === 0 ? (
+                            <p className="text-gray-500">Chưa có đánh giá nào</p>
+                        ) : (
+                            <div className='py-10 px-8 border rounded-md mt-5'>
+                                <div className='flex flex-col justify-center items-center mb-5'>
+                                    <p className='text-2xl mb-2'>{trungBinhSao} trên 5</p>
+                                    <div className="flex">
+                                        {[1,2,3,4,5].map((star) => {
+                                            if (star <= Math.floor(trungBinhSao)) {
+                                                return <FaStar key={star} size={30} className="text-yellow-500 mr-1" />;
+                                            } else if (star <= Math.ceil(trungBinhSao) && trungBinhSao % 1 !== 0) {
+                                                return <FaStarHalfAlt key={star} size={30} className="text-yellow-500 mr-1" />;
+                                            } else {
+                                                return <FaRegStar key={star} size={30} className="text-gray-300 mr-1" />;
+                                            }
+                                        })}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="flex justify-between items-center mb-4">
+                                        <button
+                                            onClick={() => locDanhGia(0)}
+                                            className={`bg-pink-200 hover:bg-pink-300 text-pink-800 font-semibold py-2 px-4 shadow w-full ${
+                                                soSaoDaChon === 0 ? "bg-pink-400 text-white" : ""
+                                            }`}
+                                        >
+                                            Tất cả ({soLuongDanhGia})
+                                        </button>
+                                        <button
+                                            onClick={() => locDanhGia(5)}
+                                            className={`bg-pink-200 hover:bg-pink-300 text-pink-800 font-semibold py-2 px-4 shadow w-full ${
+                                                soSaoDaChon === 5 ? "bg-pink-400 text-white" : ""
+                                            }`}                                        
+                                        >
+                                            5 Sao ({soLuongDanhGiaTungSao[4]})
+                                        </button>
+                                        <button
+                                            onClick={() => locDanhGia(4)}
+                                            className={`bg-pink-200 hover:bg-pink-300 text-pink-800 font-semibold py-2 px-4 shadow w-full ${
+                                                soSaoDaChon === 4 ? "bg-pink-400 text-white" : ""
+                                            }`}                                        
+                                        >
+                                            4 Sao ({soLuongDanhGiaTungSao[3]})
+                                        </button>
+                                        <button
+                                            onClick={() => locDanhGia(3)}
+                                            className={`bg-pink-200 hover:bg-pink-300 text-pink-800 font-semibold py-2 px-4 shadow w-full ${
+                                                soSaoDaChon === 3 ? "bg-pink-400 text-white" : "" 
+                                            }`}                                        
+                                        >
+                                        3 Sao ({soLuongDanhGiaTungSao[2]})
+                                        </button>
+                                        <button
+                                            onClick={() => locDanhGia(2)}
+                                            className={`bg-pink-200 hover:bg-pink-300 text-pink-800 font-semibold py-2 px-4 shadow w-full ${
+                                            soSaoDaChon === 2 ? "bg-pink-400 text-white" : ""
+                                            }`}                                        
+                                        >
+                                            2 Sao ({soLuongDanhGiaTungSao[1]})
+                                        </button>
+                                        <button
+                                            onClick={() => locDanhGia(1)}
+                                            className={`bg-pink-200 hover:bg-pink-300 text-pink-800 font-semibold py-2 px-4 shadow w-full ${
+                                            soSaoDaChon === 1 ? "bg-pink-400 text-white" : ""
+                                            }`}                                        
+                                        >
+                                            1 Sao ({soLuongDanhGiaTungSao[0]})
+                                        </button>
+
+                                    </div>
+                                </div>
+                                <div>
+                                {dsDanhGiaLoc && dsDanhGiaLoc.length > 0 ? (
+                                    dsDanhGiaLoc.map(danhGia => (
+                                        <div key={danhGia._id} className='flex bg-pink-100 mb-5 shadow-lg rounded-md p-3'>
+                                            <img
+                                                src={danhGia?.idNguoiDungDG?.anhND || 'https://placehold.co/60x60/FF69B4/FFFFFF'}
+                                                alt={danhGia?.idNguoiDungDG?.tenNguoiDung || 'Người dùng image'}
+                                                className="w-10 h-10 object-cover rounded-full mr-3"
+                                            />
+                                            <div>
+                                                <p className='font-bold'>{danhGia?.idNguoiDungDG?.tenNguoiDung}</p>
+                                                <p className='text-xs mb-2'>{moment(danhGia.ngayDanhGia).format('YYYY-MM-DD hh:mm')}</p>
+                                                <div className="flex">
+                                                    {[1,2,3,4,5].map((star) => {
+                                                        if (star <= Math.floor(danhGia.soSao)) {
+                                                            return <FaStar key={star} size={15} className="text-yellow-500 mr-1" />;
+                                                        } else {
+                                                            return <FaRegStar key={star} size={15} className="text-gray-300 mr-1" />;
+                                                        }
+                                                    })}
+                                                </div>
+                                                <p className='mt-2'>{danhGia.noiDung}</p>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p>Không có đánh giá nào.</p>
+                                )}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 

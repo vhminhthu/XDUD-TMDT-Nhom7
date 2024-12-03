@@ -17,20 +17,19 @@ const PaymentResult = () => {
             const fetchGiaoDichData = async () => {
                 try {
                     const response = await Axios.get(`/api/donhang/laygiaodichtheoid/${donhangId}`);
-                    console.log("Dữ liệu giao dịch: ", response.data);  // In ra dữ liệu trả về từ API
+                    console.log("Dữ liệu giao dịch: ", response.data);
                     setGiaodich(response.data);
                 } catch (err) {
                     console.error('Lỗi khi tải giao dịch:', err);
-                    navigate('/'); // Chuyển hướng nếu có lỗi khi tải giao dịch
+                    navigate('/');
                 }
             };
 
             fetchGiaoDichData();
 
-            // Khởi động bộ đếm
             setCountdown(30);
         } else {
-            navigate('/');  // Chuyển hướng về trang chủ nếu không có donhangId trong cookie
+            navigate('/');
         }
     }, [donhangId, navigate]);
 
@@ -41,11 +40,10 @@ const PaymentResult = () => {
             }, 1000);
             return () => clearInterval(timer);
         } else {
-            navigate('/');  // Khi đếm ngược hết thời gian, chuyển hướng về trang chủ
+            navigate('/');
         }
     }, [countdown, navigate]);
 
-    // Kiểm tra và hiển thị giao dịch
     if (!giaodich) {
         return (
             <div className='flex items-center justify-center w-screen h-screen'>

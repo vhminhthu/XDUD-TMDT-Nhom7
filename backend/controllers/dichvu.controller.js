@@ -1,6 +1,7 @@
 import Dichvu from '../models/dichvu.model.js'
 import Nguoidung from '../models/nguoidung.model.js'
 import Danhmuc from '../models/danhmuc.model.js'
+import Donhang from '../models/donhang.model.js'
 import {v2 as cloudinary} from 'cloudinary'
 
 export const layDichVu = async (req, res) => {
@@ -249,7 +250,15 @@ export const idDichvu = async (req, res) => {
             danhSachYeuThich: id
         });
 
-        return res.status(200).json({ dichvu, isFavorite, favoriteCount });
+        const soLuongDanhGia = dichvu.danhSachDanhGia.length;
+        const tongSoSao = dichvu.danhSachDanhGia.reduce((total, danhGia) => total + danhGia.soSao, 0);
+        const trungBinhSao = soLuongDanhGia > 0 ? (tongSoSao / soLuongDanhGia).toFixed(2) : 0;
+
+        const saoCount = [1, 2, 3, 4, 5].map(sao => {
+            return dichvu.danhSachDanhGia.filter(danhGia => danhGia.soSao === sao).length;
+        });
+
+        return res.status(200).json({ dichvu, isFavorite, favoriteCount, trungBinhSao, soLuongDanhGia, saoCount });
     } catch (error) {
         res.status(500).json({ error: "Lỗi 500" });
         console.log("Lỗi idDichVu controller", error.message);
@@ -421,3 +430,69 @@ export const timKiem = async (req, res) => {
         console.log("Lỗi tim kiem controller", error.message);
     }
 };
+
+export const capNhatDanhGia = async (req, res) => {
+    try {
+        const id = req.nguoidung._id;
+        const idDV= req.params.id; 
+        
+        const {
+            donHangId,
+            soSao,
+            noiDung,
+        } = req.body;
+
+        if (!soSao || !noiDung) {
+            return res.status(400).json({ message: "Yêu cầu phải cung cấp đầy đủ số sao và nội dung" });
+        }
+
+        const dichvu = await Dichvu.findById(idDV);
+        if (!dichvu) {
+            return res.status(404).json({ message: 'Không có dịch vụ này' });
+        }
+
+        const danhGiaMoi = {
+            soSao,
+            noiDung,
+            idNguoiDungDG: id,
+            ngayDanhGia: new Date(),
+        };
+
+        dichvu.danhSachDanhGia.push(danhGiaMoi);
+        
+        await dichvu.save();
+
+        const donhang = await Donhang.findById(donHangId);
+        if (!donhang) {
+            return res.status(404).json({ message: 'Không có đơn hàng này' });
+        }
+        donhang.danhGia = true;
+        await donhang.save();
+
+        return res.status(200).json({ message: 'Cập nhật đánh giá thành công'});
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Đã xảy ra lỗi trong quá trình cập nhật đánh giá' });
+    }
+};
+
+export const layDanhGia = async (req, res) => {
+    const idDV = req.params.id; 
+
+    try {
+        const dichvu = await Dichvu.findById(idDV)
+        .populate({
+            path: 'danhSachDanhGia.idNguoiDungDG',
+            select: 'tenNguoiDung anhND '
+        });;
+        if (!dichvu) {
+            return res.status(404).json({ message: 'Không có dịch vụ này' });
+        }
+
+        return res.status(200).json({ danhSachDanhGia: dichvu.danhSachDanhGia });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Đã xảy ra lỗi khi lấy đánh giá' });
+    }
+};
+

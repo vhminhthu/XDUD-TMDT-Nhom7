@@ -5,7 +5,7 @@ import CategoriesMenu from "../../components/user/CategoriesMenu";
 
 function FreelancerOverview() {
     const [isAccepted, setIsAccepted] = useState(false);
-    const navigate = useNavigate(); // Dùng useNavigate để chuyển hướng
+    const navigate = useNavigate();
 
     const handleAcceptTerms = () => {
         if (isAccepted) {

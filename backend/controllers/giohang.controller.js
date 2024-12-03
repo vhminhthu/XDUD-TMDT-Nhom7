@@ -23,7 +23,6 @@ export const themDichVuVaoGioHang = async (req, res) => {
         let giohang = await Giohang.findOne({ _id: id });
 
         if (!giohang) {
-            // Tạo mới giỏ hàng nếu chưa có
             giohang = new Giohang({
                 _id: id,
                 dichVu: {
@@ -38,7 +37,6 @@ export const themDichVuVaoGioHang = async (req, res) => {
                 }
             });
         } else {
-             // Kiểm tra nếu dichVuId và phân loại trùng nhau
             const kiemtra = 
             giohang.dichVu.dichVuId.toString() === dichVuId &&
             giohang.dichVu.phanLoai.tenLoai === phanLoai.tenLoai &&
@@ -47,7 +45,6 @@ export const themDichVuVaoGioHang = async (req, res) => {
             giohang.dichVu.phanLoai.thoiGianDuKien === phanLoai.thoiGianDuKien;
 
         if (!kiemtra) {
-             // Nếu dịch vụ khác, cập nhật thông tin
             giohang.dichVu.dichVuId = dichVuId;
             giohang.dichVu.phanLoai = {
                 tenLoai: phanLoai.tenLoai,

@@ -11,6 +11,11 @@ function QuanLyDonHang() {
     const [hienThiChiTiet, setHienThiChiTiet] = useState(false);
     const [chiTietDonHang, setChiTietDonHang] = useState(null);
 
+    const [hienThiDanhGia, setHienThiDanhGia] = useState(false);
+    const [donHangDanhGia, setDonHangDanhGia] = useState(null);
+    const [chonSao, setChonSao] = useState(0);
+    const [comment, setComment] = useState('');
+
     useEffect(() => {
         fetchDonhangData(trangThaiDH);
     }, [trangThaiDH]);
@@ -52,6 +57,35 @@ function QuanLyDonHang() {
             return false;
         }
     };
+
+    const huyDanhGia = async () => {
+        setHienThiDanhGia(false);
+        setChonSao(0);
+        setComment('');
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!chonSao || !comment) {
+            alert('Vui lòng chọn số sao và nhập nhận xét.');
+            return;
+        }
+
+        try {
+            await axios.patch(`/api/dichvu/capnhat/danhgia/${donHangDanhGia.dichVuId._id}`, {
+                donHangId: donHangDanhGia._id,
+                soSao: chonSao,
+                noiDung: comment,
+            });
+            alert('Đánh giá thành công');
+            setHienThiDanhGia(false);
+        } catch (error) {
+            console.error("Lỗi khi gửi đánh giá:", error);
+            alert('Đã xảy ra lỗi. Vui lòng thử lại.');
+        }
+    };
+
 
     return (
         <div className="container mx-auto px-4">
@@ -140,12 +174,21 @@ function QuanLyDonHang() {
                                                 </button>
                                             )}
 
-                                            {(donhang.trangThaiDH === "Đã kết thúc") && (
+                                            {(donhang.trangThaiDH === "Đã kết thúc") && (!donhang.danhGia) && (
                                                 <button
                                                     className="text-xs border border-pink-300 text-yellow-800 font-semibold py-1 px-3 rounded-lg shadow"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setDonHangDanhGia(donhang);
+                                                        setHienThiDanhGia(true);
+                                                    }}
                                                 >
                                                     Đánh giá
                                                 </button>
+                                            )}
+
+                                            {(donhang.trangThaiDH === "Đã kết thúc") && (donhang.danhGia) && (
+                                                <span className="text-gray-400">Đã đánh giá</span>
                                             )}
                                             </td>
                                         </tr>
@@ -176,6 +219,53 @@ function QuanLyDonHang() {
                     </div>
                 )}
 
+                {hienThiDanhGia && donHangDanhGia && (
+                    <div id="DanhGia" className="absolute bg-white border rounded shadow-lg top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-4 w-1/2 max-h-96 overflow-y-auto">
+                        <h2 className="font-semibold text-lg mb-4 flex items-center">Đánh giá đơn hàng</h2>
+                        <p><strong>Dịch vụ:</strong> {donHangDanhGia.dichVuId?.tenDichVu}</p>
+                        <p><strong>Người bán:</strong> {donHangDanhGia.nguoiBanId?.tenNguoiDung}</p>
+                        
+                            <div className="mb-4">
+                                <label className="block text-sm font-semibold mb-2">Số sao:</label>
+                                <div className="flex items-center mb-4">
+                                    {[1, 2, 3, 4, 5].map((sao) => (
+                                    <button
+                                        key={sao}
+                                        onClick={() => setChonSao(sao)}
+                                        className={`text-3xl ${sao <= chonSao ? "text-yellow-500" : "text-gray-300"}`}
+                                    >
+                                        ★
+                                    </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-sm font-semibold mb-2">Nội dung đánh giá:</label>
+                                <textarea
+                                    className="w-full border rounded px-3 py-2 mb-4"
+                                    rows="4"
+                                    placeholder="Nhập nhận xét của bạn..."
+                                    value={comment}
+                                    onChange={(e) => setComment(e.target.value)}
+                            ></textarea>
+                            </div>
+                            <div className="flex justify-end">
+                                
+                                <button
+                                    className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-lg shadow mr-2"
+                                    onClick={huyDanhGia}
+                                >
+                                    Hủy
+                                </button>
+                                <button
+                                    className="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-lg shadow"
+                                    onClick={handleSubmit}
+                                >
+                                    Gửi đánh giá
+                                </button>
+                            </div>
+                    </div>
+                )}
 
             </div>
         </div>

@@ -15,7 +15,6 @@ function Profile() {
     });
 
     useEffect(() => {
-        // Gửi yêu cầu GET để lấy thông tin người dùng
         const fetchUserData = async () => {
             try {
                 const response = await axios.get('/api/auth/getme');
