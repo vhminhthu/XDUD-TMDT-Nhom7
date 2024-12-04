@@ -143,7 +143,10 @@ export const layDonHangCuaNguoiBan = async (req, res) => {
         const nguoiBanId = req.nguoidung._id;
         const { trangThaiDH } = req.params;
 
-        const filter = { nguoiBanId };
+        const filter = {
+            nguoiBanId: nguoiBanId,
+            "giaoDich.trangThaiThanhToan": "Thành công",
+        };
         if (trangThaiDH) {
             filter.trangThaiDH = trangThaiDH;
         }
